@@ -1,0 +1,11 @@
+/.idea
+/nbproject
+*.swp
+/storage/*
+!/storage/.gitkeep
+/app/cache/*
+!/app/cache/.gitkeep
+/engine
+/libs
+/logs
+*.bak
