@@ -26,7 +26,7 @@ class Autoloader
                 // Check if file exists and if it is not a dir with same name
                 if (\is_file($pathToFile)) {
                     // Include all files
-                    require($pathToFile);
+                    require $pathToFile;
                 }
             }
         }

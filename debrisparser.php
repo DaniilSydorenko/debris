@@ -1,4 +1,7 @@
 <?php
 require_once 'lib/autoload.php';
 
-$IMAGEPARSER = new ImageParser();
+$ImageParser = new ImageParser();
+$AudioParser = new AudioParser();
+
+echo $ImageParser->getSize() . " = " . $AudioParser->getSize();

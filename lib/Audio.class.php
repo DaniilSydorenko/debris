@@ -1,8 +1,8 @@
 <?php
-class ImageParser
+class AudioParser
 {
-    const IMG_WIDTH = null;
-    const IMG_HEIGHT = null;
+    const AUD_WIDTH = null;
+    const AUD_HEIGHT = null;
 
     private $_width = null;
     private $_height = null;
