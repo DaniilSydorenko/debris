@@ -43,6 +43,13 @@ class Url
 	private $shortUrl;
 
 	/**
+	 * @var string $description
+	 *
+	 * @Column(name="`description`", type="string", length=2048, nullable=false)
+	 */
+	private $description;
+
+	/**
 	 * @var string $hash
 	 *
 	 * @Column(name="`hash`", type="string", length=256, nullable=false)
@@ -118,6 +125,26 @@ class Url
 	 */
 	public function getShortUrl() {
 		return $this->shortUrl;
+	}
+
+	/**
+	 * Set description
+	 *
+	 * @param string $description
+	 * @return \App\Entities\Url
+	 */
+	public function setDescription($description) {
+		$this->description = $description;
+		return $this;
+	}
+
+	/**
+	 * Get description
+	 *
+	 * @return string 
+	 */
+	public function getDescription() {
+		return $this->description;
 	}
 
 	/**
