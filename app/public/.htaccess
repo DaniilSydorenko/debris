@@ -1,0 +1,48 @@
+<ifModule mod_deflate.c>
+        <filesMatch "\.(css|js|x?html?|php)$">
+                SetOutputFilter DEFLATE
+        </filesMatch>
+</ifModule>
+
+<ifModule mod_expires.c>
+        # Turn on Expires and set default to 0
+        ExpiresActive On
+        ExpiresDefault A0
+
+        # Disable ETag
+        FileETag None
+        Header unset ETag
+
+        # Set up caching on media files for 1 year
+        <filesMatch "\.(flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav|swf)$">
+                ExpiresDefault A29030400
+                Header append Cache-Control "public"
+        </filesMatch>
+
+        # Set up 1 year caching on commonly updated files
+        <filesMatch "\.(xml|txt|html|js|css)$">
+                ExpiresDefault A29030400
+                Header append Cache-Control "proxy-revalidate"
+        </filesMatch>
+
+        # Force no caching for dynamic files
+        #<filesMatch "\.(php|cgi|pl|htm)$">
+        #        ExpiresActive Off
+        #        Header set Cache-Control "private, no-cache, no-store, proxy-revalidate, no-transform"
+        #        Header set Pragma "no-cache"
+        #</filesMatch>
+</ifModule>
+
+php_flag register_globals off
+php_flag magic_quotes_gpc off
+php_flag display_errors on
+
+AddType text/x-component .htc
+
+# Rewrite engine
+RewriteEngine On
+
+# Application core
+RewriteRule ^(.*/)?\\.svn/ - [F,L]
+RewriteRule !\.(js|ico|gif|GIF|jpg|JPG|jpeg|png|swf|pdf|html|htm|crt|css|htc|eot|svg|ttf|woff|xml)$ index.php
+

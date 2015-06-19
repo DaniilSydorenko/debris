@@ -1,0 +1,577 @@
+#!/usr/bin/env php
+<?php
+/*******************************************************************************
+ * Name: Gaia command line executor
+ * Version: 1.0
+ * Author: Przemyslaw Ankowski (przemyslaw.ankowski@gmail.com)
+ ******************************************************************************/
+
+
+// Class namespace
+namespace Gaia;
+
+// Include Gaia loader
+include_once \dirname(__FILE__) . "/../engine/Gaia.php";
+
+
+/**
+ * Executor
+ */
+class Executor
+{
+    // Object instance
+    private static $oInstance = false;
+
+    // Request (dispatcher data)
+    private $Request = null;
+
+    // Gaia configuration
+    private $Config = null;
+
+    // Console output
+    private $Output = null;
+
+    /* Default command class namespace prefix */
+    private static $DEFAULT_COMMAND_CLASS_NAMESPACE_PREFIX = "\\App\\Commands";
+
+
+    /**
+     * Default constructor
+     *
+     * @param $stage
+     * @param $argv
+     */
+    private function __construct($stage, $argv) {
+        // Initialize gaia with stage
+        \Gaia::getInstance($stage);
+
+        // Class name with default namespace
+        $className = self::$DEFAULT_COMMAND_CLASS_NAMESPACE_PREFIX;
+
+        // Method name
+        $methodName = null;
+
+        // Method parameters
+        $methodParameters = null;
+
+        // Input arguments
+        $inputArguments = array();
+
+        // Initialize console output
+        $this->Output = new \Gaia\Executable\Console\Output();
+
+        // Load gaia config with good stage
+        $this->Config = new \Gaia\Utils\Config("gaia.ini", $this->getStage());
+
+        // Set include path
+        \set_include_path(\get_include_path() . \PATH_SEPARATOR . $this->Config->gaia->paths->include);
+
+        // Debug mode
+        if ($this->Config->gaia->debug) {
+            \error_reporting(-1);
+        }
+
+        // Production mode
+        else {
+            \error_reporting(0);
+        }
+
+        // Something goes wrong - too less arguments
+        if (\count($argv) < 2) {
+            // Show information about using executor
+            $this->showInformation();
+
+            // Exit with error
+            exit(1);
+        }
+
+        // User want to see classes listing
+        if (\strtolower($argv[1]) == "list" || \strtolower($argv[1]) == "-list" || \strtolower($argv[1]) == "--list") {
+            // Show classes listing
+            $this->showClassesListing();
+
+            // Exit without error
+            exit(0);
+        }
+
+        // Last parameter name
+        $lastParameterName = null;
+
+        // Try to parse method arguments
+        for ($index = 1 ; $index <= \count($argv) - 1 ; $index++) {
+            // Try to get command name and method name
+            if ($index == 1) {
+                // Try to get command name and method name
+                $tmp = \explode(":", $argv[$index]);
+
+                // Could not get command name or method name
+                if (\count($tmp) < 1) {
+                    // Show error message
+                    $this->error("Could not get command class name or method name");
+
+                    // Exit with error
+                    exit(1);
+                }
+
+                // Set class and method name
+                else if (\count($tmp) > 1) {
+                    // Set class name
+                    for ($i = 0 ; $i < \count($tmp) - 1 ; $i++) {
+                        $className .= "\\" . $tmp[$i];
+                    }
+
+                    // Set method name
+                    $methodName = $tmp[\count($tmp) - 1];
+                }
+
+                // Set method name
+                else {
+                    $className .= "\\" . $tmp[0];
+                }
+
+                // Continue
+                continue;
+            }
+
+            // Too short argument name
+            if (\strlen($argv[$index]) <= 1 && $lastParameterName == null) {
+                // Show information about error
+                $this->error("'" . $argv[$index] . "' is not valid parameter name, probably name is too short");
+
+                // Exit with error
+                exit(1);
+            }
+
+            // Is parameter name?
+            $isParameterName = false;
+
+            // Parameter name offset
+            $parameterNameOffset = 0;
+
+            // This is parameter name (long-opt)
+            if (\strpos($argv[$index], "--") === 0) {
+                // Set parameter name state
+                $isParameterName = true;
+
+                // Set parameter name offset
+                $parameterNameOffset = 2;
+            }
+
+            // This is parameter name (short-opt)
+            else if (\strpos($argv[$index], "-") === 0) {
+                // Set parameter name state
+                $isParameterName = true;
+
+                // Set parameter name offset
+                $parameterNameOffset = 1;
+            }
+
+            // This is parameter name
+            if ($isParameterName) {
+                // Get parameter name without opt prefix
+                $parameterName = \substr($argv[$index], $parameterNameOffset, \strlen($argv[$index]));
+
+                // I think we have '=' in parameter name, so, this could be parameter name and value!
+                if (\strpos($parameterName, "=") !== false) {
+                    // Add parameter name and value on arguments array
+                    $inputArguments[\substr($parameterName, 0, \strpos($parameterName, "="))] = \substr($parameterName, \strpos($parameterName, "=") + 1, \strlen($parameterName));
+
+                    // Continue
+                    continue;
+                }
+
+                // Set last parameter name
+                $lastParameterName = $parameterName;
+
+                // Add parameter name on arguments array
+                $inputArguments[$lastParameterName] = true;
+
+                // Reset parameter name state
+                $isParameterName = false;
+
+                // Reset parameter name offset
+                $parameterNameOffset = 0;
+            }
+
+            // This is a parameter value
+            else {
+                // Add parameter value to arguments array
+                if ($lastParameterName != null) {
+                    // Add value
+                    $inputArguments[$lastParameterName] = $argv[$index];
+                }
+
+                // Reset last parameter name
+                $lastParameterName = null;
+            }
+        }
+
+        // Class doesn't exist - try to build new class name
+        if (!\class_exists($className)) {
+            // Ha! Method name is class name
+            if ($methodName != null) {
+                // Set new class name
+                $className .= "\\" . $methodName;
+
+                // Reset method name
+                $methodName = null;
+            }
+        }
+
+        // Method name is not defined - list all available method for selected command
+        if ($methodName == null && \class_exists($className)) {
+            // Show listing
+            $this->showClassMethodsListing($className);
+
+            // Exit without error
+            exit(0);
+        }
+
+        // Create data object - need to get method parameters
+        $this->Request = new \Gaia\Core\Dispatcher\Data($this->Config);
+
+        // Set class name
+        $this->Request->setClassName($className);
+
+        // Set method name
+        $this->Request->setMethodName($methodName);
+
+        // Set parameters
+        $this->Request->setParameters(new \Gaia\Utils\Object($inputArguments));
+
+        // Try to get method parameters
+        try {
+            // Reflect method
+            $ReflectionMethod = new \Gaia\Core\Reflections\Method($this->Request->getClassName(), $this->Request->getMethodName());
+
+            // Method is private or protected
+            if ($ReflectionMethod->isPrivate() || $ReflectionMethod->isProtected()) {
+                throw new \Exception("Method " . $this->Request->getMethodName() . "() in class " . $this->Request->getClassName() . " is private or protected");
+            }
+        }
+
+        // Something goes wrong
+        catch (\Exception $Exception) {
+            // Show error message
+            $this->error($Exception->getMessage());
+
+            // Exit with error
+            exit(1);
+        }
+    }
+
+    /**
+     * Show logo
+     */
+    private function showLogo() {
+        $this->Output->write("");
+        $this->Output->write("<success> ██████╗  █████╗ ██╗ █████╗</success>     ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗ ██████╗ ██████╗");
+        $this->Output->write("<success>██╔════╝ ██╔══██╗██║██╔══██╗</success>    ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║   ██║╚══██╔══╝██╔═══██╗██╔══██╗");
+        $this->Output->write("<success>██║  ███╗███████║██║███████║</success>    █████╗   ╚███╔╝ █████╗  ██║     ██║   ██║   ██║   ██║   ██║██████╔╝");
+        $this->Output->write("<success>██║   ██║██╔══██║██║██╔══██║</success>    ██╔══╝   ██╔██╗ ██╔══╝  ██║     ██║   ██║   ██║   ██║   ██║██╔══██╗");
+        $this->Output->write("<success>╚██████╔╝██║  ██║██║██║  ██║</success>    ███████╗██╔╝ ██╗███████╗╚██████╗╚██████╔╝   ██║   ╚██████╔╝██║  ██║");
+        $this->Output->write("<success> ╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝</success>    ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝    ╚═╝    ╚═════╝ ╚═╝  ╚═╝", 2);
+    }
+
+    /**
+     * Show information
+     */
+    private function showInformation() {
+        // Show logo
+        $this->showLogo();
+
+        // Information about run
+        $this->Output->write("Usage <comment>(RUN)</comment>:");
+        $this->Output->write("------------");
+        $this->Output->write("\t   <info>php execute Namespace:Class:method --param=\"value\"</info>");
+        $this->Output->write("\tor <info>php execute Namespace:Class:method --param \"value\"</info>");
+        $this->Output->write("\tor <info>php execute Namespace:Class:method --param (set param as true)</info>");
+        $this->Output->write("\tor <info>php execute Namespace:Class:method  -param=\"value\"</info>");
+        $this->Output->write("\tor <info>php execute Namespace:Class:method  -param \"value\"</info>");
+        $this->Output->write("\tor <info>php execute Namespace:Class:method  -param (set param as true)</info>", 2);
+
+        $this->Output->write("\tRun defined method from defined command class name.");
+        $this->Output->write("\tInput parameters need to have name like function parameters.", 2);
+        $this->Output->write("\ti.e:");
+        $this->Output->write("\t     <info>PHP:</info> public function test(\$param1, \$param2);");
+        $this->Output->write("\t <info>Console:</info> php execute Example:test --param1=false --param2=true", 2);
+
+        // Information about listings
+        $this->Output->write("Usage <comment>(LISTING)</comment>:");
+        $this->Output->write("----------------");
+
+        // Classes listing
+        $this->Output->write("\t<info>php execute list</info>");
+        $this->Output->write("\t- show classes listing.", 2);
+
+        // Class methods listing
+        $this->Output->write("\t<info>php execute Namespace:Class</info>");
+        $this->Output->write("\t- show methods list for selected class.", 2);
+
+        // Current stage information
+        $this->Output->write("Current stage: <info>" . $this->getStage() . "</info>");
+
+        // Build underline
+        $underline = "---------------";
+
+        // Add extra '-' chars to output underline
+        for ($i = 0 ; $i < \strlen($this->getStage()) ; $i++) {
+            $underline .= "-";
+        }
+
+        // Show underline
+        $this->Output->write($underline, 2);
+    }
+
+    /**
+     * Show available command line classes
+     */
+    private function showClassesListing() {
+        // Create recursive directory iterator
+        $Directory = new \RecursiveDirectoryIterator(__DIR__ . "/../app/commands/");
+
+        // Create recursive iterator
+        $DirectoryIterator = new \RecursiveIteratorIterator($Directory);
+
+        // Create regex iterator (get only extension defined in gaia.dispatcher.controller.extension in gaia.ini)
+        $Regex = new \RegexIterator($DirectoryIterator, "/^.+\\.php$/i", \RecursiveRegexIterator::GET_MATCH);
+
+        // Show info
+        $this->Output->write("");
+        $this->Output->write("Available command line classes:");
+        $this->Output->write("-------------------------------");
+
+        // Iterate over selected directory
+        foreach ($Regex as $filePath => $filePathAsArray) {
+            // Try to get class name with part of namespace
+            $className = \explode("app/commands/", $filePath);
+
+            // Something goes wrong - check next file
+            if (\is_array($className) && \count($className) != 2) {
+                continue;
+            }
+
+            // Get potential class name
+            $className = $className[1];
+
+            // Remove extension from potential class name
+            $className = \str_replace(".php", "", $className);
+
+            // Small bug fix for slash :)
+            $className = \str_replace("/", "\\", $className);
+
+            // Create class name as executor action (to show user)
+            $classNameAsExecutorAction = \str_replace("\\", ":", $className);
+
+            // Show class on screen
+            $this->Output->write("\t+ <info>" . $classNameAsExecutorAction . "</info>");
+        }
+
+        // Show info
+        $this->Output->write("");
+    }
+
+    /**
+     * Show selected class methods listing
+     *
+     * @param $className
+     */
+    private function showClassMethodsListing($className) {
+        // Create reflection class
+        $ReflectionClass = new \Gaia\Core\Reflections\Object($className);
+
+        // Create class name as executor action (to show user)
+        $classNameAsExecutorAction = \str_replace(":App:Commands:", "", \str_replace("\\", ":", $className));
+
+        // Show info
+        $this->Output->write("");
+        $this->Output->write("Available methods in class <info>" . $classNameAsExecutorAction . "</info>:");
+
+        // Build underline
+        $underline = "----------------------------";
+
+        // Add extra '-' chars to output underline
+        for ($i = 0 ; $i < \strlen($classNameAsExecutorAction) ; $i++) {
+            $underline .= "-";
+        }
+
+        // Show underline
+        $this->Output->write($underline);
+
+        // Get methods and method parameters
+        foreach ($ReflectionClass->getMethods() as $Method) {
+            // Only public methods
+            if ($Method->isPublic() && $Method->getName() != "__call" && $Method->getName() != "__construct" && $Method->getName() != "loadPlugin") {
+                // Create method description
+                $methodDescription = "\t+ <info>" . $Method->getName() . "</info>(";
+
+                // Add method parameters to method description
+                foreach ($Method->getParameters() as $id => $Parameter) {
+                    if ($id > 0) {
+                        $methodDescription .= ", ";
+                    }
+
+                    // Add method parameter to method description
+                    $methodDescription .= $Parameter->getName();
+
+                    // This parameter is option - add value
+                    if ($Parameter->isOptional()) {
+                        // Set parameter default value depend on type
+                        $parameterDefaultValue = $Parameter->getDefaultValue();
+
+                        // Try to treat value as string in case we have '0' set as leading character
+                        if (\is_string($parameterDefaultValue) || (\is_numeric($parameterDefaultValue) && \strlen($parameterDefaultValue) >= 2 && $parameterDefaultValue[0] == "0")) {
+                            $parameterDefaultValue = "\"" . $parameterDefaultValue . "\"";
+                        }
+
+                        elseif (\is_float($parameterDefaultValue)) {
+                            $parameterDefaultValue = (float)$parameterDefaultValue;
+                        }
+
+                        elseif (\is_array($parameterDefaultValue)) {
+                            $parameterDefaultValue = "[]";
+                        }
+
+                        elseif (\is_null($parameterDefaultValue)) {
+                            $parameterDefaultValue = "null";
+                        }
+
+                        // Add parameter default value
+                        $methodDescription .= " = " . $parameterDefaultValue;
+                    }
+                }
+
+                // Add closing tag to method description
+                $methodDescription .= ")";
+
+                // Show method on screen
+                $this->Output->write($methodDescription);
+            }
+        }
+
+        // Show info
+        $this->Output->write("");
+    }
+
+    /**
+     * Show error message
+     *
+     * @param $message
+     */
+    private function error($message) {
+        // Get current date
+        $CurrentDate = new \DateTime();
+
+        // Show error message
+        $this->Output->write("<error>ERROR</error>\t <info>" . $CurrentDate->format("Y-m-d H:i:s") . "</info> " . $message);
+    }
+
+    /**
+     * Show information message
+     *
+     * @param $message
+     */
+    private function info($message) {
+        // Get current date
+        $CurrentDate = new \DateTime();
+
+        // Show error message
+        $this->Output->write("<warning>INFO</warning>\t <info>" . $CurrentDate->format("Y-m-d H:i:s") . "</info> " . $message);
+    }
+
+    /**
+     * Get gaia executor instance
+     *
+     * @param $stage
+     * @param $argv
+     *
+     * @return \Gaia\Executor
+     */
+    final public static function getInstance($stage, $argv) {
+        if (self::$oInstance == false) {
+            self::$oInstance = new \Gaia\Executor($stage, $argv);
+        }
+
+        return self::$oInstance;
+    }
+
+    /**
+     * Get stage
+     *
+     * @return string
+     */
+    final public function getStage() {
+        return \strlen(\Gaia::getInstance()->getStage()) > 0 ? \Gaia::getInstance()->getStage() : "production";
+    }
+
+    /**
+     * Run execution
+     */
+    final public function run() {
+        // Running in production mode
+        if ($this->getStage() === "production") {
+            // Show user prompt
+            $this->Output->write("<warning>***</warning> Do You want run selected method on <info>production</info> stage? [yes/no]: ", 0);
+
+            // Inform user about current staging and check he want run that function anyway..
+            $userAnswer = \trim(\fgets(\STDIN));
+
+            // User answer doesn't match / user doesn't want to run selected command
+            if ($userAnswer !== "yes") {
+                // Exit with error
+                exit(1);
+            }
+
+            // Show info
+            $this->Output->write("----------------------------------------------------------------------");
+        }
+
+        // Show information about current stage
+        $this->info("Running on <info>" . $this->getStage() . "</info> stage...");
+
+        // Try to run requested action
+        try {
+            // Check database is enabled
+            if ($this->Config->gaia->database->enabled) {
+                // Try to initialize doctrine
+                $Doctrine = \Gaia\Components\ORM\Doctrine::getInstance("database.ini", $this->Config->gaia->debug, $this->getStage());
+
+                // Is not initialized - throw new exception
+                if ($Doctrine->isInitialized() == false) {
+                    throw $Doctrine->getInitializeException();
+                }
+            }
+
+            // Class name
+            $className = $this->Request->getClassName();
+
+            // Create new command object
+            $Command = new $className($this->Request, $this->Output, $this->getStage(), $this->Config->gaia->database->enabled);
+
+            // Command class is not an instance of Gaia\Executable\Command - so fucking wrong!
+            if (!$Command instanceof \Gaia\Executable\Command) {
+                throw new \Exception($this->Request->getClassName() . " class is not an instance of \\Gaia\\Executable\\Command");
+            }
+
+            // Call function from class
+            $result = \call_user_func_array(array($Command, $this->Request->getMethodName()), $this->Request->getMethodParameters());
+
+            // Exit with result from command
+            exit($result);
+        }
+
+        // Something goes wrong
+        catch (\Exception $Exception) {
+            // Show error message
+            $this->error($Exception->getFile() . ", line " . $Exception->getLine() . ": " . $Exception->getMessage());
+
+            // Exit with error
+            exit(1);
+        }
+    }
+}
+
+/**
+ * Try to execute command line action
+ */
+\Gaia\Executor::getInstance(\getenv("APPLICATION_ENV"), $argv)->run();

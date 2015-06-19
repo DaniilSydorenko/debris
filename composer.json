@@ -1,0 +1,38 @@
+{
+    "name"          : "unit27/gaia-skeleton",
+    "description"   : "Gaia application skeleton",
+    
+    "authors": [
+        {
+            "name"  : "Przemyslaw Ankowski",
+            "email" : "przemyslaw.ankowski@gmail.com",
+            "role"  : "Developer"
+        }
+    ],
+            
+    "repositories": [
+        {
+            "type"  : "composer",
+            "url"   : "http://packages.unit27.net"
+        }
+    ],
+            
+    "require": {
+        "php"                           : ">=5.6.0",
+        "twig/twig"                     : "1.18.*@dev",
+        "doctrine/dbal"                 : "2.5.*",
+        "doctrine/orm"                  : "2.5.*",
+        "doctrine/common"               : "2.5.*",
+        "ezyang/htmlpurifier"           : "dev-master",
+        
+        "unit27/gaia-installer"         : "dev-master",
+        "unit27/gaia-engine"            : "dev-master",
+
+		"unit27/gaia-component-orm"     : "dev-master",
+		"unit27/gaia-component-twig"	: "dev-master"
+    },
+            
+    "config": {
+        "vendor-dir": "libs"
+    }
+}
