@@ -1,19 +1,12 @@
 {
-    "name"          : "unit27/gaia-skeleton",
-    "description"   : "Gaia application skeleton",
+    "name"          : "debris",
+    "description"   : "Url shortener Debris",
     
     "authors": [
         {
-            "name"  : "Przemyslaw Ankowski",
-            "email" : "przemyslaw.ankowski@gmail.com",
+            "name"  : "Daniil Sydorenko",
+            "email" : "daniildevelooper@gmail.com",
             "role"  : "Developer"
-        }
-    ],
-            
-    "repositories": [
-        {
-            "type"  : "composer",
-            "url"   : "http://packages.unit27.net"
         }
     ],
             
