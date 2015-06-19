@@ -4,6 +4,7 @@
 /storage/*
 !/storage/.gitkeep
 /app/cache/*
+app/cache/
 !/app/cache/.gitkeep
 /logs
 *.bak
