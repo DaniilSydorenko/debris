@@ -20,6 +20,9 @@ class Main extends \Gaia\Controllers\Twig
      * @param null $key
      */
     public function show($key = null) {
+        $Request = (array) $this->getRequest()->getURI();
+        var_dump($Request);
+        var_dump($_SERVER['REQUEST_METHOD']); die;
         $key = $this->getRequest()->getURI();
         // 404
 //        if ($this->getRequest()->is404()) {
