@@ -20,7 +20,9 @@ use App\Entities\Url;
  * @TODO CURL вместо header
  * @TODO Возврат descripion при помощи get_meta_tags
  * @TODO Возврат 0 или 1 или 2
+ * @TODO Поправить валидацию
  * @TODO Сессия в Main и провер ка в JSON
+ * @TODO выгеренирить desc in entities
  * @TODO
  *
  */
@@ -89,7 +91,7 @@ class Shortener
                 return $response = [
                     'response' => $responseResult,
                     'longUrl'  => $url,
-                    'urlViews' => $Url->getViews()
+                    'urlViews' => 0
                 ];
 
             }
@@ -165,6 +167,7 @@ class Shortener
         $Url = new Url();
         $Url->setUrl($url);
         $Url->setShortUrl($shortUrl);
+        $Url->setDescription("description");
         $Url->setViews(0);
         $Url->setHash($hash);
         $Url->setIp($userIp);
@@ -174,9 +177,8 @@ class Shortener
 
         // Save to db
         try {
-            $EM = $Doctrine->getEntityManager();
-            $EM->persist($Url);
-            $EM->flush();
+            $Doctrine->persist($Url);
+            $Doctrine->flush();
             return null;
         } catch (\Exception $Exception) {
             $Error = new \Exception(\App\Libraries\Error\Code::CAN_NOT_SAVE);
