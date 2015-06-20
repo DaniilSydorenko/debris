@@ -1,39 +1,30 @@
 <?php
 /*******************************************************************************
- * Name: App -> JSON -> Shortener
- * Version:
- * Author:
+ * Name: App -> Components
+ * Version: 1.0
+ * Author: Daniil Sydorenko (daniildeveloper@gmail.com)
  ******************************************************************************/
 
 
-// Namespace
-namespace App\JSON;
-use App\Entities\Url;
-//use App\Components\Shortener as ShortenerComponent;
-//public function shortenUrl($url) {
-//    $Shortener = new ShortenerComponent();
-//    $Shortener->shortenUrl($url);
-//}
+// Default namespace
+namespace App\Components;
 
+use Gaia\Components\ORM\Doctrine;
+use App\Entities\Url;
 
 /**
  * Shortener class
+ *
  * @TODO Кирилица в описании
  * @TODO Дубликация ключей
  * @TODO CURL вместо header
  * @TODO Возврат descripion при помощи get_meta_tags
  * @TODO Возврат 0 или 1 или 2
  * @TODO Сессия в Main и провер ка в JSON
- * @TODO выгеренирить desc in entities
  * @TODO
- * @TODO
- * @TODO
- * @TODO
- * @TODO
- *
  *
  */
-class Shortener extends \Gaia\Controllers\JSON
+class Shortener
 {
 
     public function shortenUrl($url)
@@ -42,7 +33,10 @@ class Shortener extends \Gaia\Controllers\JSON
         $validUrl = $this->validateUrl($url);
 
         if ($validUrl && $validUrl !== "debris") {
-            $Url = $this->getDoctrine()->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
+
+            $Doctrine = Doctrine::getInstance();
+
+            $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
 
             $response = '';
 
@@ -89,7 +83,7 @@ class Shortener extends \Gaia\Controllers\JSON
 
                 // Try to save
                 $result = $this->setShortUrl($url, $shortUrl, $hash, $userIp);
-                $Url = $this->getDoctrine()->getRepository("App\\Entities\\Url")->findOneBy(["url" => $url]);
+                $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
                 $responseResult = (!empty($result)) ? $result : $shortUrl;
 
                 return $response = [
@@ -175,9 +169,12 @@ class Shortener extends \Gaia\Controllers\JSON
         $Url->setHash($hash);
         $Url->setIp($userIp);
 
+        $Doctrine = Doctrine::getInstance();
+
+
         // Save to db
         try {
-            $EM = $this->getDoctrine()->getEntityManager();
+            $EM = $Doctrine->getEntityManager();
             $EM->persist($Url);
             $EM->flush();
             return null;
