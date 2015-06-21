@@ -72,8 +72,13 @@ class Shortener
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(),1)),0,4);
 
                     // Get url description and set no more than 500 symbols
-                    $tagDescription = get_meta_tags($urlFiltered);
-                    $urlDescription = \mb_substr($tagDescription['description'], 0 , 500, 'UTF-8');
+                    $tagDescription = \get_meta_tags($urlFiltered);
+                    if (isset($tagDescription['description'])) {
+                        $urlDescription = \mb_substr($tagDescription['description'], 0 , 500, 'UTF-8');
+                    } else {
+                        $urlDescription = $urlFiltered;
+                    }
+
 
                     // If key is duplicated - generating new key till will find the original one
 //                do {
