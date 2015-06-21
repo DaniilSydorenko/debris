@@ -20,10 +20,8 @@ class Main extends \Gaia\Controllers\Twig
      * @param null $key
      */
     public function show($key = null) {
-//        $Request = (array) $this->getRequest()->getURI();
-//        var_dump($Request);
-//        var_dump($_SERVER['REQUEST_METHOD']); die;
         $key = $this->getRequest()->getURI();
+
         // 404
 //        if ($this->getRequest()->is404()) {
 //            // Show error page
@@ -62,7 +60,7 @@ class Main extends \Gaia\Controllers\Twig
 
         // @TODO: WEAK PLACE
         // Try to get url
-        $Url = $this->getDoctrine()->getRepository("App\\Entities\\Url")->findOneBy(["shortUrl" => $shortUrl]);
+        $Url = $this->getDoctrine()->getRepository("App\\Models\\Url")->findOneBy(["shortUrl" => $shortUrl]);
         if (!$Url) {
             return $this->redirect("/");
         } else {

@@ -67,15 +67,25 @@ class Shortener
                     ];
                 } else {
                     // Set short url path
+                    // Разобраться почему генерит --> http://www.debrs.com
                     $rootPath = 'http://'. \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
 
                     // Set short url key
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(),1)),0,4);
 
                     // Get url description and set no more than 300 symbols in UTF-8 and trim from spaces
-                    $tagDescription = \get_meta_tags($urlFiltered);
-                    if (isset($tagDescription['description'])) {
-                        $urlDescription = \mb_substr(\trim($tagDescription['description']), 0 , 300, 'UTF-8');
+                    //@TODO Eсть сайты где нету description !!!!!!!!!!
+                    //@TODO BUG --> http://vindavoz.ru/win_obwee/411-krakozyabry-vmesto-russkih-bukv.html
+                    //@TODO BUG --> алохо русский записало
+
+                    $tagDesc = \get_meta_tags($urlFiltered);
+                    $urlDescNotChecked = $tagDesc['description'];
+
+                    $urlDescription = '';
+                    if (isset($urlDescNotChecked)) {
+                        if (mb_detect_encoding($urlDescNotChecked, 'UTF-8', true) === false) {
+                            $urlDescription = \mb_substr(\trim(\utf8_encode($urlDescNotChecked)), 0 , 300, 'UTF-8');
+                        }
                     } else {
                         $urlDescription = $urlFiltered;
                     }
