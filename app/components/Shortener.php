@@ -50,20 +50,31 @@ class Shortener
                 break;
 
             case 3 :
+                // If last symbol is "/" - just return url, if no - return url + "/"
+                // Need to make "http://url.com" === "http://url.com/"
                 $urlFiltered = (\mb_substr($url, -1) == '/') ? \mb_strtolower($url) : \mb_strtolower($url) . '/';
                 $Doctrine = Doctrine::getInstance();
+
+                // Try to find url
                 $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $urlFiltered]);
                 $response = '';
                 if ($Url instanceof \App\Entities\Url) {
                     return $response = [
-                        'response' => $Url->getShortUrl(),
-                        'longUrl'  => $url,
-                        'urlViews' => $Url->getViews()
+                        'response'    => $Url->getShortUrl(),
+                        'description' => $Url->getDescription(),
+                        'longUrl'     => $url,
+                        'urlViews'    => $Url->getViews()
                     ];
                 } else {
                     // Set short url path
                     $rootPath = 'http://'. \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
+
+                    // Set short url key
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(),1)),0,4);
+
+                    // Get url description and set no more than 500 symbols
+                    $tagDescription = get_meta_tags($urlFiltered);
+                    $urlDescription = \mb_substr($tagDescription['description'], 0 , 500, 'UTF-8');
 
                     // If key is duplicated - generating new key till will find the original one
 //                do {
@@ -93,14 +104,15 @@ class Shortener
                         $userIp = 'UNKNOWN';
 
                     // Try to save
-                    $result = $this->setShortUrl($url, $shortUrl, $hash, $userIp);
+                    $result = $this->setShortUrl($url, $shortUrl, $urlDescription, $hash, $userIp);
                     $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
-                    $responseResult = (!empty($result)) ? $result : $shortUrl;
+                    $responseResult = (empty($result)) ? $shortUrl : $result;
 
                     return $response = [
-                        'response' => $responseResult,
-                        'longUrl'  => $url,
-                        'urlViews' => 0
+                        'response'    => $responseResult,
+                        'description' => $urlDescription,
+                        'longUrl'     => $url,
+                        'urlViews'    => 0
                     ];
                 }
                 break;
@@ -172,17 +184,18 @@ class Shortener
      *
      * @param $url
      * @param $shortUrl
+     * @param $description
      * @param $hash
      * @param $userIp
      * @return null|string
      */
-    protected function setShortUrl($url, $shortUrl, $hash, $userIp)
+    protected function setShortUrl($url, $shortUrl, $description, $hash, $userIp)
     {
         // Create new url
         $Url = new Url();
         $Url->setUrl($url);
         $Url->setShortUrl($shortUrl);
-        $Url->setDescription("description");
+        $Url->setDescription($description);
         $Url->setViews(0);
         $Url->setHash($hash);
         $Url->setIp($userIp);
