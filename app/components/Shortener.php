@@ -134,6 +134,19 @@ class Shortener
      */
     protected function validateUrl($url)
     {
+        /* И здесь тоже проверять длину !
+         *! to lowercase
+         * ! rtrim - "/" - чтобы со слешо и без слеша в конце - было одно и тоже
+         *
+         *
+         * 1. Check by pregmatch, if not url - send 0
+         * - If yes :
+         *  2. If "debris url" - send 1
+                If no:
+         *      3. Send request, if didnt find "200" - send 0
+         *          - if yes - send 2
+         * */
+
         if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $url)) {
             // If was shortered by Debris
             $strinurl = \strpos($url, "debris.dev");
@@ -141,11 +154,27 @@ class Shortener
             if ($strinurl) {
                 return "debris";
             } else {
-                // Send request
-                $file_headers = @\get_headers($url);
+                // User agent(Browser)
+                $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
+
+                // Initialize curl
+                $ch = curl_init();
+
+                curl_setopt($ch, CURLOPT_USERAGENT,      $agent);
+                curl_setopt($ch, CURLOPT_URL,            $url);
+                curl_setopt($ch, CURLOPT_HEADER,         true);
+                curl_setopt($ch, CURLOPT_NOBODY,         true);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT,        15);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
+                // Execute curl
+                $document = curl_exec($ch);
+                $document = explode("\n", $document);
 
                 // Return true if found 200 in the response
-                return (\strpos($file_headers[0],"200")) ? true : false;
+                return (\strpos($document[0],"200")) ? true : false;
             }
         } else {
             return false;

@@ -105,6 +105,11 @@ $(document).ready(function(){
                 $submit.prop("disabled", true);
             }, 300);
         } else if (urlToValidate.length >= 1 && !myRegExp.test(urlToValidate)) {
+
+            // Check url length
+            // to lowercase
+            // rtrim / ??
+
             $("form.url-snr-form").hide();
             $(".url-snr-box").fadeIn("slow");
 
