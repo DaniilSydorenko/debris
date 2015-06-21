@@ -29,6 +29,7 @@ class Shortener
     public function shortenUrl($url)
     {
         $validUrl = $this->validateUrl($url);
+
         switch ($validUrl) {
             case 0 :
                 return $response = [
@@ -71,14 +72,13 @@ class Shortener
                     // Set short url key
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(),1)),0,4);
 
-                    // Get url description and set no more than 500 symbols
+                    // Get url description and set no more than 500 symbols in UTF-8 and trim from spaces
                     $tagDescription = \get_meta_tags($urlFiltered);
                     if (isset($tagDescription['description'])) {
-                        $urlDescription = \mb_substr($tagDescription['description'], 0 , 500, 'UTF-8');
+                        $urlDescription = \mb_substr(\trim($tagDescription['description']), 0 , 500, 'UTF-8');
                     } else {
                         $urlDescription = $urlFiltered;
                     }
-
 
                     // If key is duplicated - generating new key till will find the original one
 //                do {
@@ -108,7 +108,7 @@ class Shortener
                         $userIp = 'UNKNOWN';
 
                     // Try to save
-                    $result = $this->setShortUrl($url, $shortUrl, $urlDescription, $hash, $userIp);
+                    $result = $this->setShortUrl($urlFiltered, $shortUrl, $urlDescription, $hash, $userIp);
                     $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
                     $responseResult = (empty($result)) ? $shortUrl : $result;
 
@@ -151,6 +151,8 @@ class Shortener
      */
     protected function validateUrl($url)
     {
+        // здесь тоже валидацию по последнему слешу
+
         if (\mb_strlen($url, 'UTF-8') < 1000) {
             if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $url)) {
 
