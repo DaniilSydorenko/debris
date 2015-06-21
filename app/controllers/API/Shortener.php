@@ -64,24 +64,21 @@ class Shortener extends \Gaia\Controllers\JSON
     }
 
     /**
-     * Method: endpoint
-     * The Model requested in the URI. eg: /files
-     */
-    public function setEndpoint()
-    {
-        $endpoint = $this->getRequest()->getURI();
-        if (!empty($endpoint)) {
-            $this->endpoint = explode('', \rtrim($endpoint), '/');
-        }
-    }
-
-    /**
-     * Method: endpoint
-     * The Model requested in the URI. eg: /files
+     * Method: getEndpoint
+     * Get working method, in my case short()
      */
     public function getEndpoint()
     {
-        return $this->endpoint[2];
+        return $this->endpoint;
+    }
+    /**
+     * Method: setEndpoint
+     * Set working method, in my case short()
+     * @param mixed $endpoint
+     */
+    public function setEndpoint($endpoint)
+    {
+        $this->endpoint = $endpoint;
     }
 
     /**
@@ -119,33 +116,30 @@ class Shortener extends \Gaia\Controllers\JSON
         header("Access-Control-Allow-Methods: *");
         header("Content-Type: application/json");
 
+        // Set request method
         $this->setMethod($_SERVER['REQUEST_METHOD']);
+
+        // Set request arguments
         $this->setArgs((array)$this->getRequest()->getParameters());
+
+        // Set API endpoint
+        $endpoint = explode('/', \rtrim($this->getRequest()->getURI(), '/'));
+        $this->setEndpoint(\strtolower($endpoint[2]));
 
         switch ($this->getMethod()) {
         case 'GET':
-                $endpoint = \strtolower($this->getEndpoint());
+            if ($this->getEndpoint() == "short") {
+                $this->_response('OK', 200);
 
-                if (empty($endpoint) && $endpoint == "short") {
-                    $this->_response('Invalid Path', 400);
-                } else {
-                    $requestData = $this->request = $this->_cleanInputs($this->getArgs());
-                    $this->_response('OK', 200);
-
-                    // Защитить от написания лишнего
-                    // или нправильного пути
-                    // endpoint short
-                    // или нправильного пути
-                    // или нправильного пути
-
-
-//                    return $response = [
-//                        'urlViews' => $requestData['url']
-//                    ];
-
-                    $ShortenerComponent = new ShortenerComponent();
-                    return $ShortenerComponent->shortenUrl($requestData['url']);
-                }
+                //@TODO Защитить от написания лишних символов или нправильного пути
+                //@TODO Доделать endpoint short & parameter(index) - url
+                //@TODO Доделать setters nad getters
+                $requestData = $this->_cleanInputs($this->getArgs());
+                $ShortenerComponent = new ShortenerComponent();
+                return $ShortenerComponent->shortenUrl($requestData['url']);
+            } else {
+                $this->_response('Invalid Path', 400);
+            }
             break;
         case 'DELETE':
         case 'POST':

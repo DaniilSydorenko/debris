@@ -17,7 +17,6 @@ use App\Entities\Url;
  *
  * @TODO Кирилица в описании
  * @TODO Дубликация ключей
- * @TODO Возврат descripion при помощи get_meta_tags
  * @TODO Сессия в Main и провер ка в JSON
  *
  */
@@ -168,6 +167,9 @@ class Shortener
                     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
                     $document = curl_exec($ch);
                     $document = explode("\n", $document);
+
+                    //@TODO Может возвращать валидированный линк ??
+                    //@TODO Обрезать в конце знаки ??
 
                     return (\strpos($document[0],"200")) ? 3 : 0;
                 }
