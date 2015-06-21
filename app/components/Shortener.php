@@ -78,17 +78,53 @@ class Shortener
                     //@TODO BUG --> http://vindavoz.ru/win_obwee/411-krakozyabry-vmesto-russkih-bukv.html
                     //@TODO BUG --> алохо русский записало
 
-                    $tagDesc = \get_meta_tags($urlFiltered);
-                    $urlDescNotChecked = $tagDesc['description'];
+                    function file_get_contents_curl($url)
+                    {
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_HEADER, 0);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_URL, $url);
+                        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+                        $data = curl_exec($ch);
+                        curl_close($ch);
 
-                    $urlDescription = '';
-                    if (isset($urlDescNotChecked)) {
-                        if (mb_detect_encoding($urlDescNotChecked, 'UTF-8', true) === false) {
-                            $urlDescription = \mb_substr(\trim(\utf8_encode($urlDescNotChecked)), 0 , 300, 'UTF-8');
-                        }
-                    } else {
-                        $urlDescription = $urlFiltered;
+                        return $data;
                     }
+
+                    $html = file_get_contents_curl($urlFiltered);
+
+//                    $doc = new \DOMDocument();
+//                    @$doc->loadHTML($html);
+//                    $nodes = $doc->getElementsByTagName('title');
+//                    $urlDescription = $nodes->item(0)->nodeValue;
+
+                    function get_html_title($html){
+                        preg_match('/\<title.*\>(.*)\<\/title\>/isU', $html, $matches);
+                        return $matches[1];
+                    }
+
+                    $urlDescription = get_html_title($html);
+
+//                    $doc = new \DOMDocument();
+//                    @$doc->loadHTMLFile($urlFiltered);
+//                    $xpath = new \DOMXPath($doc);
+//                    $urlDescription = $xpath->query('//title')->item(0)->nodeValue."\n";
+
+//                    $tagDesc = \get_meta_tags($urlFiltered);
+//                    if ($tagDesc) {
+//                        $urlDescNotChecked = $tagDesc['description'];
+//                        $urlDescription = '';
+//                        if (isset($urlDescNotChecked)) {
+//                            if (mb_detect_encoding($urlDescNotChecked, 'UTF-8', true) === false) {
+//                                $urlDescription = \mb_substr(\trim(\utf8_encode($urlDescNotChecked)), 0 , 300, 'UTF-8');
+//                            }
+//                        } else {
+//                            $urlDescription = $urlFiltered;
+//                        }
+//                    } else {
+//                        $urlDescription = 'description';
+//                    }
+
 
                     // If key is duplicated - generating new key till will find the original one
 //                do {
