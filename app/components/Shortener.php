@@ -28,30 +28,28 @@ class Shortener
      */
     public function shortenUrl($url)
     {
-        $validUrl = $this->validateUrl($url);
-        var_dump($validUrl); die;
-        switch ($validUrl) {
-            case 0 :
+        switch ($this->validateUrl($url)) {
+            case 001 :
                 return $response = [
-                    'response' => "Your url bigger than 1000 signs. It is so strange, yeah?"
+                    'response' => $this->_errorCode(001)
                 ];
                 break;
 
-            case 1 :
+            case 002 :
                 return $response = [
-                    'response' => "We are so sorry, but you url is invalid."
+                    'response' => $this->_errorCode(002)
                 ];
                 break;
 
-            case 2 :
+            case 003 :
                 return $response = [
-                    'response' => "Wazzup, this is a Debris shortened url."
+                    'response' => $this->_errorCode(003)
                 ];
                 break;
 
-            case 3 :
+            case 004 :
                 return $response = [
-                    'response' => "This page does not exists"
+                    'response' => $this->_errorCode(004)
                 ];
                 break;
 
@@ -66,19 +64,19 @@ class Shortener
                 $response = '';
                 if ($Url instanceof \App\Entities\Url) {
                     return $response = [
-                        'response'    => $Url->getShortUrl(),
+                        'response' => $Url->getShortUrl(),
                         'description' => $Url->getDescription(),
-                        'longUrl'     => $url,
-                        'urlViews'    => $Url->getViews()
+                        'longUrl' => $url,
+                        'urlViews' => $Url->getViews()
                     ];
                 } else {
 
                     // Set short url path
                     // Разобраться почему иногда генерит --> http://www.debrs.com
-                    $rootPath = 'http://'. \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
+                    $rootPath = 'http://' . \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
 
                     // Set short url key
-                    $shortUrl = $rootPath . \substr(md5(uniqid(rand(),1)),0,4);
+                    $shortUrl = $rootPath . \substr(md5(uniqid(rand(), 1)), 0, 4);
 
                     // Get url description and set no more than 300 symbols in UTF-8 and trim from spaces
                     //@TODO Eсть сайты где нету description !!!!!!!!!!
@@ -86,7 +84,7 @@ class Shortener
                     //@TODO BUG --> алохо русский записало
 
                     // Site title
-                    $siteTitle = $this->getDescription($urlFiltered);
+                    $siteTitle = $this->getSiteDescription($urlFiltered);
 
                     // If key is duplicated - generating new key till will find the original one
 //                do {
@@ -102,15 +100,15 @@ class Shortener
                     $userIp = '';
                     if (\getenv('HTTP_CLIENT_IP'))
                         $userIp = getenv('HTTP_CLIENT_IP');
-                    else if(\getenv('HTTP_X_FORWARDED_FOR'))
+                    else if (\getenv('HTTP_X_FORWARDED_FOR'))
                         $userIp = getenv('HTTP_X_FORWARDED_FOR');
-                    else if(\getenv('HTTP_X_FORWARDED'))
+                    else if (\getenv('HTTP_X_FORWARDED'))
                         $userIp = getenv('HTTP_X_FORWARDED');
-                    else if(\getenv('HTTP_FORWARDED_FOR'))
+                    else if (\getenv('HTTP_FORWARDED_FOR'))
                         $userIp = getenv('HTTP_FORWARDED_FOR');
-                    else if(\getenv('HTTP_FORWARDED'))
+                    else if (\getenv('HTTP_FORWARDED'))
                         $userIp = getenv('HTTP_FORWARDED');
-                    else if(\getenv('REMOTE_ADDR'))
+                    else if (\getenv('REMOTE_ADDR'))
                         $userIp = getenv('REMOTE_ADDR');
                     else
                         $userIp = 'UNKNOWN';
@@ -120,15 +118,13 @@ class Shortener
                     $responseResult = (empty($result)) ? $shortUrl : $result;
 
                     return $response = [
-                        'response'    => $responseResult,
+                        'response' => $responseResult,
                         'description' => $siteTitle,
-                        'longUrl'     => $url,
-                        'urlViews'    => 0
+                        'longUrl' => $url,
+                        'urlViews' => 0
                     ];
                 }
                 break;
-
-
         }
     }
 
@@ -159,26 +155,28 @@ class Shortener
      * @param $url
      * @return null|string
      */
-    protected  function getDescription($url) {
+    protected function getSiteDescription($url)
+    {
         $siteTitle = null;
 
-        $opts = [
-            'http' => [
-                'header' => "User-Agent:MyAgent/1.0\r\n"
-            ]
-        ];
-        $context = stream_context_create($opts);
-        $header = file_get_contents($url, false, $context);
+        try {
+            $opts = ['http' => ['header' => "User-Agent:MyAgent/1.0\r\n"]];
+            $context = \stream_context_create($opts);
+            $header = \file_get_contents($url, false, $context);
+        } catch (\Exception $Exception) {
+            $siteTitle = null;
+        }
+
 
         // Get page source
-        if(!$header) return false;
+        if (!$header) return false;
 
         // ERROR!!!
         // http://developerslife.ru/1242/
         // "file_get_contents(http://developerslife.ru/1242/): failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found"
 
         // Subtract title
-        if( preg_match("|<[s]*title[s]*>([^<]+)<[s]*/[s]*title[s]*>|Ui", $header, $t))  {
+        if (preg_match("|<[s]*title[s]*>([^<]+)<[s]*/[s]*title[s]*>|Ui", $header, $t)) {
             $siteTitle = trim($t[1]);
         }
 
@@ -193,9 +191,9 @@ class Shortener
                  */
 
                 $encodedSiteTitle = \mb_convert_encoding($siteTitle, "utf-8", "windows-1251");
-                $siteTitle = \mb_substr(\trim($encodedSiteTitle), 0 , 300, 'UTF-8');
+                $siteTitle = \mb_substr(\trim($encodedSiteTitle), 0, 300, 'UTF-8');
             } else {
-                $siteTitle = \mb_substr(\trim($siteTitle), 0 , 300, 'UTF-8');
+                $siteTitle = \mb_substr(\trim($siteTitle), 0, 300, 'UTF-8');
             }
         } else {
             $siteTitle = $url;
@@ -226,16 +224,16 @@ class Shortener
                 $urlDebris = \strpos(\mb_strtolower($url), "debris");
 
                 if ($urlDebris) {
-                    return 2;
+                    return 003;
                 } else {
                     $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
                     $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_USERAGENT,      $agent);
-                    curl_setopt($ch, CURLOPT_URL,            $url);
-                    curl_setopt($ch, CURLOPT_HEADER,         true);
-                    curl_setopt($ch, CURLOPT_NOBODY,         true);
+                    curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+                    curl_setopt($ch, CURLOPT_URL, $url);
+                    curl_setopt($ch, CURLOPT_HEADER, true);
+                    curl_setopt($ch, CURLOPT_NOBODY, true);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_TIMEOUT,        15);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
                     $document = curl_exec($ch);
@@ -249,17 +247,17 @@ class Shortener
                     // и проверю урл здесь, то можно возварщать массив с урлом и тайтлом отсюда
                     // из валидейшена
 
-                    if (\strpos($response[0],"200")) {
+                    if (\strpos($response[0], "200")) {
                         return $url;
                     } else {
-                        return 3;
+                        return 004;
                     }
                 }
             } else {
-                return 1;
+                return 002;
             }
         } else {
-            return 0;
+            return 001;
         }
     }
 
@@ -292,5 +290,22 @@ class Shortener
             $Error = new \Exception(\App\Libraries\Error\Code::CAN_NOT_SAVE);
             return $Error->getMessage();
         }
+    }
+
+    /**
+     * Method: _requestStatus
+     *
+     * @param integer $code
+     */
+    private function _errorCode($code)
+    {
+        $status = [
+            001 => "Your url bigger than 1000 signs. It is so strange, yeah?",
+            002 => "We are so sorry, but you url is invalid.",
+            003 => "Wazzup, this is a Debris shortened url.",
+            004 => "This page does not exists",
+            005 => 'Internal Server Error',
+        ];
+        return ($status[$code]) ? $status[$code] : $status[005];
     }
 }
