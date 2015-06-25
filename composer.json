@@ -9,7 +9,7 @@
             "role"  : "Developer"
         }
     ],
-            
+
     "require": {
         "php"                           : ">=5.6.0",
         "twig/twig"                     : "1.18.*@dev",
@@ -17,12 +17,14 @@
         "doctrine/orm"                  : "2.5.*",
         "doctrine/common"               : "2.5.*",
         "ezyang/htmlpurifier"           : "dev-master",
-        
+
         "unit27/gaia-installer"         : "dev-master",
         "unit27/gaia-engine"            : "dev-master",
 
 		"unit27/gaia-component-orm"     : "dev-master",
-		"unit27/gaia-component-twig"	: "dev-master"
+		"unit27/gaia-component-twig"	: "dev-master",
+
+        "electrolinux/phpquery"         : "dev-master"
     },
             
     "config": {

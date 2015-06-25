@@ -135,6 +135,7 @@ class Shortener extends \Gaia\Controllers\JSON
                 //@TODO Доделать endpoint short & parameter(index) - url
                 //@TODO Доделать setters nad getters
                 $requestData = $this->_cleanInputs($this->getArgs());
+//                var_dump($requestData['url']); die;
                 $ShortenerComponent = new ShortenerComponent();
                 return $ShortenerComponent->shortenUrl($requestData['url']);
             } else {

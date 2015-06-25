@@ -29,7 +29,7 @@ class Shortener
     public function shortenUrl($url)
     {
         $validUrl = $this->validateUrl($url);
-
+        var_dump($validUrl); die;
         switch ($validUrl) {
             case 0 :
                 return $response = [
@@ -45,11 +45,17 @@ class Shortener
 
             case 2 :
                 return $response = [
-                'response' => "Wazzup, this is a Debris shortened url."
-            ];
+                    'response' => "Wazzup, this is a Debris shortened url."
+                ];
                 break;
 
             case 3 :
+                return $response = [
+                    'response' => "This page does not exists"
+                ];
+                break;
+
+            default:
                 // If last symbol is "/" - just return url, if no - return url + "/"
                 // Need to make "http://url.com" === "http://url.com/"
                 $urlFiltered = (\mb_substr($url, -1) == '/') ? \mb_strtolower($url) : \mb_strtolower($url) . '/';
@@ -66,8 +72,9 @@ class Shortener
                         'urlViews'    => $Url->getViews()
                     ];
                 } else {
+
                     // Set short url path
-                    // Разобраться почему генерит --> http://www.debrs.com
+                    // Разобраться почему иногда генерит --> http://www.debrs.com
                     $rootPath = 'http://'. \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
 
                     // Set short url key
@@ -78,53 +85,8 @@ class Shortener
                     //@TODO BUG --> http://vindavoz.ru/win_obwee/411-krakozyabry-vmesto-russkih-bukv.html
                     //@TODO BUG --> алохо русский записало
 
-                    function file_get_contents_curl($url)
-                    {
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_HEADER, 0);
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                        curl_setopt($ch, CURLOPT_URL, $url);
-                        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-                        $data = curl_exec($ch);
-                        curl_close($ch);
-
-                        return $data;
-                    }
-
-                    $html = file_get_contents_curl($urlFiltered);
-
-//                    $doc = new \DOMDocument();
-//                    @$doc->loadHTML($html);
-//                    $nodes = $doc->getElementsByTagName('title');
-//                    $urlDescription = $nodes->item(0)->nodeValue;
-
-                    function get_html_title($html){
-                        preg_match('/\<title.*\>(.*)\<\/title\>/isU', $html, $matches);
-                        return $matches[1];
-                    }
-
-                    $urlDescription = get_html_title($html);
-
-//                    $doc = new \DOMDocument();
-//                    @$doc->loadHTMLFile($urlFiltered);
-//                    $xpath = new \DOMXPath($doc);
-//                    $urlDescription = $xpath->query('//title')->item(0)->nodeValue."\n";
-
-//                    $tagDesc = \get_meta_tags($urlFiltered);
-//                    if ($tagDesc) {
-//                        $urlDescNotChecked = $tagDesc['description'];
-//                        $urlDescription = '';
-//                        if (isset($urlDescNotChecked)) {
-//                            if (mb_detect_encoding($urlDescNotChecked, 'UTF-8', true) === false) {
-//                                $urlDescription = \mb_substr(\trim(\utf8_encode($urlDescNotChecked)), 0 , 300, 'UTF-8');
-//                            }
-//                        } else {
-//                            $urlDescription = $urlFiltered;
-//                        }
-//                    } else {
-//                        $urlDescription = 'description';
-//                    }
-
+                    // Site title
+                    $siteTitle = $this->getDescription($urlFiltered);
 
                     // If key is duplicated - generating new key till will find the original one
 //                do {
@@ -154,26 +116,28 @@ class Shortener
                         $userIp = 'UNKNOWN';
 
                     // Try to save
-                    $result = $this->setShortUrl($urlFiltered, $shortUrl, $urlDescription, $hash, $userIp);
-                    $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
+                    $result = $this->setShortUrl($urlFiltered, $shortUrl, $siteTitle, $hash, $userIp);
                     $responseResult = (empty($result)) ? $shortUrl : $result;
 
                     return $response = [
                         'response'    => $responseResult,
-                        'description' => $urlDescription,
+                        'description' => $siteTitle,
                         'longUrl'     => $url,
                         'urlViews'    => 0
                     ];
                 }
                 break;
+
+
         }
     }
 
     /**
      * Check for duplicated by system url key
      *
-     * @param $shortUrl
-     * @param $rootPath
+     * @param $url
+     * @internal param $shortUrl
+     * @internal param $rootPath
      * @return null|string
      */
 //    protected function duplicatedUrlKey($shortUrl, $rootPath)
@@ -185,6 +149,60 @@ class Shortener
 //            return null;
 //        }
 //    }
+
+
+    /**
+     * Get site tile:
+     * 1. Check encoding
+     * 2. Set length - 300 symbols
+     *
+     * @param $url
+     * @return null|string
+     */
+    protected  function getDescription($url) {
+        $siteTitle = null;
+
+        $opts = [
+            'http' => [
+                'header' => "User-Agent:MyAgent/1.0\r\n"
+            ]
+        ];
+        $context = stream_context_create($opts);
+        $header = file_get_contents($url, false, $context);
+
+        // Get page source
+        if(!$header) return false;
+
+        // ERROR!!!
+        // http://developerslife.ru/1242/
+        // "file_get_contents(http://developerslife.ru/1242/): failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found"
+
+        // Subtract title
+        if( preg_match("|<[s]*title[s]*>([^<]+)<[s]*/[s]*title[s]*>|Ui", $header, $t))  {
+            $siteTitle = trim($t[1]);
+        }
+
+        if ($siteTitle) {
+            // If url not in utf-8 convert to utf-8
+            if (mb_detect_encoding($siteTitle, 'UTF-8', true) === false) {
+
+                /*
+                 * @TODO LANGUAGES
+                 * Big trouble with encoding
+                 * A lot of langs should be handle here
+                 */
+
+                $encodedSiteTitle = \mb_convert_encoding($siteTitle, "utf-8", "windows-1251");
+                $siteTitle = \mb_substr(\trim($encodedSiteTitle), 0 , 300, 'UTF-8');
+            } else {
+                $siteTitle = \mb_substr(\trim($siteTitle), 0 , 300, 'UTF-8');
+            }
+        } else {
+            $siteTitle = $url;
+        }
+
+        return $siteTitle;
+    }
 
     /**
      * Validate url in two steps:
@@ -203,6 +221,8 @@ class Shortener
             if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $url)) {
 
                 //@TODO А если запиздолят просто слово debris в строке ??
+                // фейковый урл со словом debris
+
                 $urlDebris = \strpos(\mb_strtolower($url), "debris");
 
                 if ($urlDebris) {
@@ -219,12 +239,21 @@ class Shortener
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
                     $document = curl_exec($ch);
-                    $document = explode("\n", $document);
+
+                    $response = explode("\n", $document);
 
                     //@TODO Может возвращать валидированный линк ??
                     //@TODO Обрезать в конце знаки ??
 
-                    return (\strpos($document[0],"200")) ? 3 : 0;
+                    // Может возвращать html страницы здесь, точнее раз делаю запрос курлом
+                    // и проверю урл здесь, то можно возварщать массив с урлом и тайтлом отсюда
+                    // из валидейшена
+
+                    if (\strpos($response[0],"200")) {
+                        return $url;
+                    } else {
+                        return 3;
+                    }
                 }
             } else {
                 return 1;
