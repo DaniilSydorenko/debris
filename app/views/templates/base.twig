@@ -19,24 +19,23 @@
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    {% set debrisDesc = "Debris Url Shortener helps you to make beautiful short url from endless string and share it for redirection to another site." %}
     {% if bodyClass == "url-snr" %}
         <meta name="description"
-              content="Debris Tools: Url Shortener helps you to make beautiful short url from endless string and share it for redirection to another site. Short long urls. Make url shorter.">
+              content="Debris Tools: Url Shortener helps you to make beautiful short url from endless string and
+              share it for redirection to another site. Short long urls. Make url shorter.">
         <meta name="keywords" content="url shortener, url shorteners, small url, short url, url, link, short">
 
         <!-- Schema.org markup for Google+ -->
         <meta itemprop="name" content="Debris | Url Shortener">
-        <meta itemprop="description"
-              content="Debris Url Shortener helps you to make beautiful short url from endless string and share it for redirection to another site.">
+        <meta itemprop="description" content="{{ debrisDesc }}">
         <meta itemprop="image" content="http://debrs.com/img/icons/favicon_sign.ico">
 
         <!-- Twitter Card data -->
         <meta name="twitter:card" content="summary">
         <meta name="twitter:site" content="@publisher_handle">
         <meta name="twitter:title" content="Debris | Url Shortener">
-        <meta name="twitter:description"
-              content="Debris Url Shortener helps you to make beautiful short url from endless string and share it for redirection to another site.">
+        <meta name="twitter:description" ontent="{{ debrisDesc }}">
         <meta name="twitter:creator" content="@dansydorenko">
         <meta name="twitter:image" content="http://debrs.com/img/icons/favicon_sign.ico">
 
@@ -44,8 +43,7 @@
         <meta property="og:title" content="Debris | Url Shortener"/>
         <meta property="og:url" content="http://debrs.com/"/>
         <meta property="og:image" content="http://debrs.com/img/icons/favicon_sign.ico"/>
-        <meta property="og:description"
-              content="Debris Url Shortener helps you to make beautiful short url from endless string and share it for redirection to another site."/>
+        <meta property="og:description" content="{{ debrisDesc }}"/>
         <meta property="og:site_name" content="Debris"/>
     {% elseif bodyClass == "file-psr" %}
         <meta name="description" content="File Parser">
@@ -110,11 +108,10 @@
     {# Vendor styles #}
     <link href="/css/normalize.css" rel="stylesheet" type="text/css">
     <link href="/css/animate.css" rel="stylesheet" type="text/css">
-    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="/fontawesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 
     {# JQuery #}
-    <script src="/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <script src="/js/vendor/jquery.min.js" type="text/javascript"></script>
 
     {# Main scrpit #}
     <script src="/js/main.js" type="text/javascript"></script>
