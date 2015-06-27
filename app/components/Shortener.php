@@ -54,21 +54,10 @@ class Shortener
                 break;
 
             default:
-
-                // Не делать гибкую обработку со слешами
-                // Просто отдавать как битли
-
-                // If last symbol is "/" - just return url, if no - return url + "/"
-                // Need to make "http://url.com" === "http://url.com/"
-//                $urlFiltered = (\mb_substr($url, -1) == '/') ? \mb_strtolower($url) : \mb_strtolower($url) . '/';
-                $urlFiltered = $url;
-
-                // Нужны или не нужны слеши ???
-
                 $Doctrine = Doctrine::getInstance();
 
                 // Try to find url
-                $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $urlFiltered]);
+                $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
 
                 $response = '';
 
@@ -85,13 +74,6 @@ class Shortener
                     // Разобраться почему иногда генерит --> http://www.debrs.com
                     $rootPath = 'http://' . \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
 
-                    // !!!!!!!!!!!!!!!!
-                    // На разных IP - могут быть одинаковые ссылки!!!!!!
-                    // Проверки ио ip
-                    //
-                    // !!!!!!!!!!!!!!!!
-
-
                     // Set short url key
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(), 1)), 0, 4);
 
@@ -100,58 +82,58 @@ class Shortener
                     //@TODO BUG --> плохо русский записало
 
                     // Site title
-                    $siteTitle = $this->getSiteDescription($urlFiltered);
+                    $siteTitle = $this->getSiteDescription($url);
 
                     // If key is duplicated - generating new key till will find the original one
-//                do {
-//                    $duplicatedUrlKey = $this->duplicatedUrlKey($shortUrl, $rootPath);
-//                    if (!$duplicatedUrlKey) {
-//                        break;
-//                    }
-//                } while ($duplicatedUrlKey);
+    //                do {
+    //                    $duplicatedUrlKey = $this->duplicatedUrlKey($shortUrl, $rootPath);
+    //                    if (!$duplicatedUrlKey) {
+    //                        break;
+    //                    }
+    //                } while ($duplicatedUrlKey);
 
-                    // Set hash(for future, maybe a password ??)
-                    $hash = \sha1(\md5(\uniqid()));
+                        // Set hash(for future, maybe a password ??)
+                        $hash = \sha1(\md5(\uniqid()));
 
-                    $userIp = '';
-                    if (\getenv('HTTP_CLIENT_IP'))
-                        $userIp = getenv('HTTP_CLIENT_IP');
-                    else if (\getenv('HTTP_X_FORWARDED_FOR'))
-                        $userIp = getenv('HTTP_X_FORWARDED_FOR');
-                    else if (\getenv('HTTP_X_FORWARDED'))
-                        $userIp = getenv('HTTP_X_FORWARDED');
-                    else if (\getenv('HTTP_FORWARDED_FOR'))
-                        $userIp = getenv('HTTP_FORWARDED_FOR');
-                    else if (\getenv('HTTP_FORWARDED'))
-                        $userIp = getenv('HTTP_FORWARDED');
-                    else if (\getenv('REMOTE_ADDR'))
-                        $userIp = getenv('REMOTE_ADDR');
-                    else
-                        $userIp = 'UNKNOWN';
+                        $userIp = '';
+                        if (\getenv('HTTP_CLIENT_IP'))
+                            $userIp = getenv('HTTP_CLIENT_IP');
+                        else if (\getenv('HTTP_X_FORWARDED_FOR'))
+                            $userIp = getenv('HTTP_X_FORWARDED_FOR');
+                        else if (\getenv('HTTP_X_FORWARDED'))
+                            $userIp = getenv('HTTP_X_FORWARDED');
+                        else if (\getenv('HTTP_FORWARDED_FOR'))
+                            $userIp = getenv('HTTP_FORWARDED_FOR');
+                        else if (\getenv('HTTP_FORWARDED'))
+                            $userIp = getenv('HTTP_FORWARDED');
+                        else if (\getenv('REMOTE_ADDR'))
+                            $userIp = getenv('REMOTE_ADDR');
+                        else
+                            $userIp = 'UNKNOWN';
 
-                    // Try to save
-                    $result = $this->setShortUrl($urlFiltered, $shortUrl, $siteTitle, $hash, $userIp);
-                    $responseResult = (empty($result)) ? $shortUrl : $result;
+                        // Try to save
+                        $result = $this->setShortUrl($url, $shortUrl, $siteTitle, $hash, $userIp);
+                        $responseResult = (empty($result)) ? $shortUrl : $result;
 
-                    return $response = [
-                        'response' => $responseResult,
-                        'description' => $siteTitle,
-                        'longUrl' => $url,
-                        'urlViews' => 0
-                    ];
-                }
-                break;
+                        return $response = [
+                            'response' => $responseResult,
+                            'description' => $siteTitle,
+                            'longUrl' => $url,
+                            'urlViews' => 0
+                        ];
+                    }
+                    break;
+            }
         }
-    }
 
-    /**
-     * Check for duplicated by system url key
-     *
-     * @param $url
-     * @internal param $shortUrl
-     * @internal param $rootPath
-     * @return null|string
-     */
+        /**
+         * Check for duplicated by system url key
+         *
+         * @param $url
+         * @internal param $shortUrl
+         * @internal param $rootPath
+         * @return null|string
+         */
 //    protected function duplicatedUrlKey($shortUrl, $rootPath)
 //    {
 //        $DuplicatedUrl = $this->getDoctrine()->getRepository('AcmeUrlBundle:Urls')->findOneBy(["shortUrl" => $shortUrl]);
@@ -189,8 +171,8 @@ class Shortener
         // Get page source
         if (!$header) return false;
 
-        // ERROR!!!
-        // http://developerslife.ru/1242/
+        // @TODO ERROR!!!
+        // Адрес с лишним слешом выдает ошибку - http://developerslife.ru/1242/ !!!
         // "file_get_contents(http://developerslife.ru/1242/): failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found"
 
         // Subtract title
@@ -205,7 +187,7 @@ class Shortener
                 /*
                  * @TODO LANGUAGES
                  * Big trouble with encoding
-                 * A lot of langs should be handle here
+                 * A lot of languages should be handle here
                  */
 
                 $encodedSiteTitle = \mb_convert_encoding($siteTitle, "utf-8", "windows-1251");
@@ -222,60 +204,57 @@ class Shortener
 
     /**
      * Validate url in two steps:
-     * 1. Check by regExp
-     * 2. If structure is ok - check if this url was not in Debris SNR
-     * 3. If was not - send request on this url
+     * 1. Check length
+     * 2. Check structure
+     * 3. Trim and make url to lowercase
+     * 4. Check for Debris domain
      *
      * @param $url
-     * @return string|bool
+     * @return int|string
      */
     protected function validateUrl($url)
     {
-        // здесь тоже валидацию по последнему слешу
-
+        // Check if url string longer than 1000 symbols
         if (\mb_strlen($url, 'UTF-8') < 1000) {
+
+            // Check if it is correct url
             if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $url)) {
 
-                // Писать только с доменом
-                $urlDebris = \strpos(\mb_strtolower($url), "debris.dev");
+                // Cut spaces and make url to lowercase
+                $urlFiltered = \trim(\mb_strtolower($url));
 
-                if ($urlDebris) {
+                // Check if url has debris domain
+                if (\strpos($urlFiltered, "debris.dev")) {
                     return 003;
                 } else {
-                    return $url;
+                    return $urlFiltered;
                 }
-//                } else {
-//                    //@TODO Обработка ошибок на курле
-//
-//                    $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-//                    $ch = curl_init();
-//                    curl_setopt($ch, CURLOPT_USERAGENT, $agent);
-//                    curl_setopt($ch, CURLOPT_URL, $url);
-//                    curl_setopt($ch, CURLOPT_HEADER, true);
-//                    curl_setopt($ch, CURLOPT_NOBODY, true);
-//                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//                    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-//                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-//                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-//                    $document = curl_exec($ch);
-//
-//                    $response = \explode("\n", $document);
-//
-//                    //@TODO Может возвращать валидированный линк ??
-//                    //@TODO Обрезать в конце знаки ??
-//
-//                    // Может возвращать html страницы здесь, точнее раз делаю запрос курлом
-//                    // и проверю урл здесь, то можно возварщать массив с урлом и тайтлом отсюда
-//                    // из валидейшена
 
-                      // Высылать данные что ссылка реальная и можно получить title
-//
-//                    if (\strpos($response[0], "200")) {
-//                        return $url;
-//                    } else {
-//                        return 004;
-//                    }
-//                }
+                /*
+                    I decided do not send request for checking url existing
+                    //@TODO Exceptions
+                    } else {
+                        $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+                        curl_setopt($ch, CURLOPT_URL, $url);
+                        curl_setopt($ch, CURLOPT_HEADER, true);
+                        curl_setopt($ch, CURLOPT_NOBODY, true);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                        $document = curl_exec($ch);
+                        $response = \explode("\n", $document);
+
+                        if (\strpos($response[0], "200")) {
+                            return $url;
+                        } else {
+                            return 004;
+                        }
+                    }
+                */
+
             } else {
                 return 002;
             }
