@@ -17,7 +17,7 @@ use App\Entities\Url;
  *
  * @TODO Кирилица в описании
  * @TODO Дубликация ключей
- * @TODO Сессия в Main и провер ка в JSON
+ * @TODO Сессия в Main и провер ка в JSON - а надо???
  *
  */
 class Shortener
@@ -54,20 +54,30 @@ class Shortener
                 break;
 
             default:
+
+                // Не делать гибкую обработку со слешами
+                // Просто отдавать как битли
+
                 // If last symbol is "/" - just return url, if no - return url + "/"
                 // Need to make "http://url.com" === "http://url.com/"
-                $urlFiltered = (\mb_substr($url, -1) == '/') ? \mb_strtolower($url) : \mb_strtolower($url) . '/';
+//                $urlFiltered = (\mb_substr($url, -1) == '/') ? \mb_strtolower($url) : \mb_strtolower($url) . '/';
+                $urlFiltered = $url;
+
+                // Нужны или не нужны слеши ???
+
                 $Doctrine = Doctrine::getInstance();
 
                 // Try to find url
                 $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $urlFiltered]);
+
                 $response = '';
+
                 if ($Url instanceof \App\Entities\Url) {
                     return $response = [
-                        'response' => $Url->getShortUrl(),
+                        'response'    => $Url->getShortUrl(),
                         'description' => $Url->getDescription(),
-                        'longUrl' => $url,
-                        'urlViews' => $Url->getViews()
+                        'longUrl'     => $url,
+                        'urlViews'    => $Url->getViews()
                     ];
                 } else {
 
@@ -75,13 +85,19 @@ class Shortener
                     // Разобраться почему иногда генерит --> http://www.debrs.com
                     $rootPath = 'http://' . \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
 
+                    // !!!!!!!!!!!!!!!!
+                    // На разных IP - могут быть одинаковые ссылки!!!!!!
+                    // Проверки ио ip
+                    //
+                    // !!!!!!!!!!!!!!!!
+
+
                     // Set short url key
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(), 1)), 0, 4);
 
                     // Get url description and set no more than 300 symbols in UTF-8 and trim from spaces
-                    //@TODO Eсть сайты где нету description !!!!!!!!!!
                     //@TODO BUG --> http://vindavoz.ru/win_obwee/411-krakozyabry-vmesto-russkih-bukv.html
-                    //@TODO BUG --> алохо русский записало
+                    //@TODO BUG --> плохо русский записало
 
                     // Site title
                     $siteTitle = $this->getSiteDescription($urlFiltered);
@@ -158,7 +174,9 @@ class Shortener
     protected function getSiteDescription($url)
     {
         $siteTitle = null;
+        $header = null;
 
+        // Make timeout if long request for title
         try {
             $opts = ['http' => ['header' => "User-Agent:MyAgent/1.0\r\n"]];
             $context = \stream_context_create($opts);
@@ -218,41 +236,46 @@ class Shortener
         if (\mb_strlen($url, 'UTF-8') < 1000) {
             if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $url)) {
 
-                //@TODO А если запиздолят просто слово debris в строке ??
-                // фейковый урл со словом debris
-
-                $urlDebris = \strpos(\mb_strtolower($url), "debris");
+                // Писать только с доменом
+                $urlDebris = \strpos(\mb_strtolower($url), "debris.dev");
 
                 if ($urlDebris) {
                     return 003;
                 } else {
-                    $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_USERAGENT, $agent);
-                    curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_HEADER, true);
-                    curl_setopt($ch, CURLOPT_NOBODY, true);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                    $document = curl_exec($ch);
-
-                    $response = explode("\n", $document);
-
-                    //@TODO Может возвращать валидированный линк ??
-                    //@TODO Обрезать в конце знаки ??
-
-                    // Может возвращать html страницы здесь, точнее раз делаю запрос курлом
-                    // и проверю урл здесь, то можно возварщать массив с урлом и тайтлом отсюда
-                    // из валидейшена
-
-                    if (\strpos($response[0], "200")) {
-                        return $url;
-                    } else {
-                        return 004;
-                    }
+                    return $url;
                 }
+//                } else {
+//                    //@TODO Обработка ошибок на курле
+//
+//                    $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
+//                    $ch = curl_init();
+//                    curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+//                    curl_setopt($ch, CURLOPT_URL, $url);
+//                    curl_setopt($ch, CURLOPT_HEADER, true);
+//                    curl_setopt($ch, CURLOPT_NOBODY, true);
+//                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//                    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+//                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+//                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+//                    $document = curl_exec($ch);
+//
+//                    $response = \explode("\n", $document);
+//
+//                    //@TODO Может возвращать валидированный линк ??
+//                    //@TODO Обрезать в конце знаки ??
+//
+//                    // Может возвращать html страницы здесь, точнее раз делаю запрос курлом
+//                    // и проверю урл здесь, то можно возварщать массив с урлом и тайтлом отсюда
+//                    // из валидейшена
+
+                      // Высылать данные что ссылка реальная и можно получить title
+//
+//                    if (\strpos($response[0], "200")) {
+//                        return $url;
+//                    } else {
+//                        return 004;
+//                    }
+//                }
             } else {
                 return 002;
             }
