@@ -13,11 +13,6 @@ use App\Components\Shortener as ShortenerComponent;
 
 /**
  * Shortener class
- * @TODO Не важно, как выполнится запрос — Facebook всегда вернет нам код 200 OK.
- * @TODO откинуть все методы кроме GET, получить все прараметры, разбить на элементы массива
- * @TODO перевести в lowercase, допускать сразу до пяти урлов, ошибки возварашать в ответе
- * @TODO
- * @TODO
  */
 class Shortener extends \Gaia\Controllers\JSON
 {
@@ -42,12 +37,8 @@ class Shortener extends \Gaia\Controllers\JSON
     private $args = [];
 
     /**
-     * Property: $request
-     *
-     */
-    private $request = null;
-
-    /**
+     * Method: getMethod
+     * Get type of Request Method
      * @return mixed
      */
     public function getMethod()
@@ -56,6 +47,8 @@ class Shortener extends \Gaia\Controllers\JSON
     }
 
     /**
+     * Method: setMethod
+     * Set type of Request Method
      * @param mixed $method
      */
     public function setMethod($method)
@@ -66,11 +59,13 @@ class Shortener extends \Gaia\Controllers\JSON
     /**
      * Method: getEndpoint
      * Get working method, in my case short()
+     * @return string
      */
     public function getEndpoint()
     {
         return $this->endpoint;
     }
+
     /**
      * Method: setEndpoint
      * Set working method, in my case short()
@@ -78,7 +73,8 @@ class Shortener extends \Gaia\Controllers\JSON
      */
     public function setEndpoint($endpoint)
     {
-        $this->endpoint = $endpoint;
+        $apiEndpoint = \explode('/', \rtrim($endpoint, '/'));
+        $this->endpoint = \strtolower($apiEndpoint[2]);
     }
 
     /**
@@ -93,7 +89,8 @@ class Shortener extends \Gaia\Controllers\JSON
 
     /**
      * Method: getArgs
-     * Return array with arguments from request
+     * Get array with arguments from request
+     * @return array
      */
     public function getArgs()
     {
@@ -102,13 +99,8 @@ class Shortener extends \Gaia\Controllers\JSON
 
     /**
      * Method: short
-     * Return shortened urls
-     * @param string $url
-     */
-
-    /**
-     * Method: checkRequest
-     * Allow for CORS, assemble and pre-process the data
+     * Check request method, get args from url and handles the data
+     * In success case return shortened url in response
      */
     public function short()
     {
@@ -123,38 +115,34 @@ class Shortener extends \Gaia\Controllers\JSON
         $this->setArgs((array)$this->getRequest()->getParameters());
 
         // Set API endpoint
-        $endpoint = explode('/', \rtrim($this->getRequest()->getURI(), '/'));
-        $this->setEndpoint(\strtolower($endpoint[2]));
+        $this->setEndpoint($this->getRequest()->getURI());
 
+        // Allow POST & GET only
         switch ($this->getMethod()) {
-        case 'GET':
-            if ($this->getEndpoint() == "short") {
-                $this->_response('OK', 200);
-
-                //@TODO Защитить от написания лишних символов или нправильного пути
-                //@TODO Доделать endpoint short & parameter(index) - url
-                //@TODO Доделать setters nad getters
-                $requestData = $this->_cleanInputs($this->getArgs());
-//                var_dump($requestData['url']); die;
-                $ShortenerComponent = new ShortenerComponent();
-                return $ShortenerComponent->shortenUrl($requestData['url']);
-            } else {
-                $this->_response('Invalid Path', 400);
-            }
-            break;
-        case 'DELETE':
-        case 'POST':
-        case 'PUT':
-            $this->_response('Invalid Method', 405);
-            break;
-        default:
-            $this->_response('Invalid Method', 405);
-            break;
+            case 'GET':
+            case 'POST':
+                if ($this->getEndpoint() == "short") {
+                    $this->_response('OK', 200);
+                    $requestData = $this->_cleanInputs($this->getArgs());
+                    $ShortenerComponent = new ShortenerComponent();
+                    $shortenUrl = $ShortenerComponent->shortenUrl($requestData['url']);
+                    return $shortenUrl;
+                } else {
+                    $this->_response('Invalid Path', 400);
+                }
+                break;
+            case 'DELETE':
+            case 'PUT':
+                $this->_response('Invalid Method', 405);
+                break;
+            default:
+                $this->_response('Invalid Method', 405);
+                break;
         }
     }
 
     /**
-     * Method: short
+     * Method: processAPI
      * Allow for CORS, assemble and pre-process the data
      */
     public function processAPI()
@@ -167,7 +155,7 @@ class Shortener extends \Gaia\Controllers\JSON
 
     /**
      * Method: _response
-     *
+     * Return HTTP response
      */
     private function _response($data, $status = 200)
     {
@@ -184,19 +172,18 @@ class Shortener extends \Gaia\Controllers\JSON
     private function _cleanInputs($data)
     {
         $clean_input = [];
-        if (is_array($data)) {
+        if (\is_array($data)) {
             foreach ($data as $k => $v) {
                 $clean_input[$k] = $this->_cleanInputs($v);
             }
         } else {
-            $clean_input = trim(strip_tags($data));
+            $clean_input = \strtolower(\trim(\strip_tags($data)));
         }
         return $clean_input;
     }
 
     /**
      * Method: _requestStatus
-     *
      * @param integer $code
      */
     private function _requestStatus($code)

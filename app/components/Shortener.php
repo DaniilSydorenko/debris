@@ -28,6 +28,10 @@ class Shortener
      */
     public function shortenUrl($url)
     {
+
+        // надо возвращать валидированный урл, обрезанный и провреный
+
+
         switch ($this->validateUrl($url)) {
             case 001 :
                 return $response = [
@@ -55,6 +59,10 @@ class Shortener
 
             default:
                 $Doctrine = Doctrine::getInstance();
+
+                //@TODO
+                // $urlFiltered = $this->validateUrl($url); везде позавенять
+
 
                 // Try to find url
                 $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
@@ -214,6 +222,10 @@ class Shortener
      */
     protected function validateUrl($url)
     {
+        //@TODO колличество знаков, точно 1000?
+        //@TODO htmlspecialchars. Проверить правильно ли сожмет
+        //@TODO
+
         // Check if url string longer than 1000 symbols
         if (\mb_strlen($url, 'UTF-8') < 1000) {
 
@@ -280,7 +292,7 @@ class Shortener
         $Url->setUrl($url);
         $Url->setShortUrl($shortUrl);
         $Url->setDescription($description);
-        $Url->setViews(0);
+        $Url->setViews(0); // ????
         $Url->setHash($hash);
         $Url->setIp($userIp);
         $Doctrine = Doctrine::getInstance();
@@ -302,7 +314,7 @@ class Shortener
     private function _errorCode($code)
     {
         $status = [
-            001 => "Your url bigger than 1000 signs. It is so strange, yeah?",
+            001 => "Your url bigger than 1000 symbols.",
             002 => "We are so sorry, but you url is invalid.",
             003 => "Wazzup, this is a Debris shortened url.",
             004 => "This page does not exists",
