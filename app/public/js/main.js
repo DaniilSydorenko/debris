@@ -134,21 +134,21 @@ $(document).ready(function(){
                     'data': {url: $urlInput.val()},
                     'success': function (data)
                     {
-                        var response = data.data.response;
+                        var shortUrl = data.data.shortUrl;
                         var longUrl = data.data.longUrl;
                         var urlViews = data.data.urlViews;
 
-                        //if (response) {
+                        //if (shortUrl) {
 
                             $("form.url-snr-form").hide();
                             $(".url-snr-box").slideUp().fadeIn();
-                            if (response.toLowerCase().indexOf("http://") >= 0) {
-                                $(".url-snr-short-url").val(response);
+                            if (shortUrl.toLowerCase().indexOf("http://") >= 0) {
+                                $(".url-snr-short-url").val(shortUrl);
                                 $(".url-snr-long-url").val(longUrl);
                                 $("#url-statistic").text(urlViews);
                             } else {
                                 $(".url-snr-url-valid").hide();
-                                $('label[for="url-snr-sad-img"]').text(response);
+                                $('label[for="url-snr-sad-img"]').text(shortUrl);
                                 $(".url-snr-url-invalid").slideUp().fadeIn();
                                 $submit.attr('disabled', 'true');
 

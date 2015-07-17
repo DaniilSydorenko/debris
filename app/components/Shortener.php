@@ -22,17 +22,34 @@ use App\Entities\Url;
  */
 class Shortener
 {
+
     /**
+     * Doctrine instance
+     * @var $Doctrine null
+     */
+    private $Doctrine = null;
+
+
+    /**
+     * Constructor for Shortener Component
+     * 1. Set Doctrine instance
+     */
+    public function __construct()
+    {
+        $this->Doctrine = Doctrine::getInstance();
+    }
+
+    /**
+     * Base functionality of URL Shortener
      * @param $url
      * @return array
      */
     public function shortenUrl($url)
     {
+        $responseFromValidation = $this->validateUrl($url);
+        $response = [];
 
-        // надо возвращать валидированный урл, обрезанный и провреный
-
-
-        switch ($this->validateUrl($url)) {
+        switch ($responseFromValidation) {
             case 001 :
                 return $response = [
                     'response' => $this->_errorCode(001)
@@ -58,90 +75,82 @@ class Shortener
                 break;
 
             default:
-                $Doctrine = Doctrine::getInstance();
-
-                //@TODO
-                // $urlFiltered = $this->validateUrl($url); везде позавенять
-
 
                 // Try to find url
-                $Url = $Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $url]);
-
-                $response = '';
+                $Url = $this->Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $responseFromValidation]);
 
                 if ($Url instanceof \App\Entities\Url) {
                     return $response = [
-                        'response'    => $Url->getShortUrl(),
+                        'shortUrl' => $Url->getShortUrl(),
                         'description' => $Url->getDescription(),
-                        'longUrl'     => $url,
-                        'urlViews'    => $Url->getViews()
+                        'longUrl' => $responseFromValidation,
+                        'urlViews' => $Url->getViews()
                     ];
                 } else {
 
                     // Set short url path
-                    // Разобраться почему иногда генерит --> http://www.debrs.com
                     $rootPath = 'http://' . \getenv('HTTP_HOST') . \dirname(\getenv('SCRIPT_NAME'));
 
                     // Set short url key
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(), 1)), 0, 4);
 
+                    //@TODO Здесь получше проверять title?
                     // Get url description and set no more than 300 symbols in UTF-8 and trim from spaces
-                    //@TODO BUG --> http://vindavoz.ru/win_obwee/411-krakozyabry-vmesto-russkih-bukv.html
-                    //@TODO BUG --> плохо русский записало
-
-                    // Site title
-                    $siteTitle = $this->getSiteDescription($url);
-
-                    // If key is duplicated - generating new key till will find the original one
-    //                do {
-    //                    $duplicatedUrlKey = $this->duplicatedUrlKey($shortUrl, $rootPath);
-    //                    if (!$duplicatedUrlKey) {
-    //                        break;
-    //                    }
-    //                } while ($duplicatedUrlKey);
-
-                        // Set hash(for future, maybe a password ??)
-                        $hash = \sha1(\md5(\uniqid()));
-
-                        $userIp = '';
-                        if (\getenv('HTTP_CLIENT_IP'))
-                            $userIp = getenv('HTTP_CLIENT_IP');
-                        else if (\getenv('HTTP_X_FORWARDED_FOR'))
-                            $userIp = getenv('HTTP_X_FORWARDED_FOR');
-                        else if (\getenv('HTTP_X_FORWARDED'))
-                            $userIp = getenv('HTTP_X_FORWARDED');
-                        else if (\getenv('HTTP_FORWARDED_FOR'))
-                            $userIp = getenv('HTTP_FORWARDED_FOR');
-                        else if (\getenv('HTTP_FORWARDED'))
-                            $userIp = getenv('HTTP_FORWARDED');
-                        else if (\getenv('REMOTE_ADDR'))
-                            $userIp = getenv('REMOTE_ADDR');
-                        else
-                            $userIp = 'UNKNOWN';
-
-                        // Try to save
-                        $result = $this->setShortUrl($url, $shortUrl, $siteTitle, $hash, $userIp);
-                        $responseResult = (empty($result)) ? $shortUrl : $result;
-
-                        return $response = [
-                            'response' => $responseResult,
-                            'description' => $siteTitle,
-                            'longUrl' => $url,
-                            'urlViews' => 0
-                        ];
+                    $siteDescription = $this->getSiteDescription($responseFromValidation);
+                    if (empty($siteDescription)) {
+                        $siteDescription = $responseFromValidation;
                     }
-                    break;
-            }
-        }
+//                    print_r($siteDescription); die;
+                    // If key is duplicated - generating new key till will find the original one
+                    //                do {
+                    //                    $duplicatedUrlKey = $this->duplicatedUrlKey($shortUrl, $rootPath);
+                    //                    if (!$duplicatedUrlKey) {
+                    //                        break;
+                    //                    }
+                    //                } while ($duplicatedUrlKey);
 
-        /**
-         * Check for duplicated by system url key
-         *
-         * @param $url
-         * @internal param $shortUrl
-         * @internal param $rootPath
-         * @return null|string
-         */
+                    // Set hash(for future, maybe a password ??)
+                    $hash = \sha1(\md5(\uniqid()));
+
+                    $userIp = '';
+                    if (\getenv('HTTP_CLIENT_IP'))
+                        $userIp = getenv('HTTP_CLIENT_IP');
+                    else if (\getenv('HTTP_X_FORWARDED_FOR'))
+                        $userIp = getenv('HTTP_X_FORWARDED_FOR');
+                    else if (\getenv('HTTP_X_FORWARDED'))
+                        $userIp = getenv('HTTP_X_FORWARDED');
+                    else if (\getenv('HTTP_FORWARDED_FOR'))
+                        $userIp = getenv('HTTP_FORWARDED_FOR');
+                    else if (\getenv('HTTP_FORWARDED'))
+                        $userIp = getenv('HTTP_FORWARDED');
+                    else if (\getenv('REMOTE_ADDR'))
+                        $userIp = getenv('REMOTE_ADDR');
+                    else
+                        $userIp = 'UNKNOWN';
+
+                    // Try to save
+                    $result = $this->setShortUrl($responseFromValidation, $shortUrl, $siteDescription, $hash, $userIp);
+                    $responseResult = (empty($result)) ? $shortUrl : $result;
+
+                    return $response = [
+                        'shortUrl' => $responseResult,
+                        'description' => $siteDescription,
+                        'longUrl' => $responseFromValidation,
+                        'urlViews' => 0
+                    ];
+                }
+                break;
+        }
+    }
+
+    /**
+     * Check for duplicated by system url key
+     *
+     * @param $url
+     * @internal param $shortUrl
+     * @internal param $rootPath
+     * @return null|string
+     */
 //    protected function duplicatedUrlKey($shortUrl, $rootPath)
 //    {
 //        $DuplicatedUrl = $this->getDoctrine()->getRepository('AcmeUrlBundle:Urls')->findOneBy(["shortUrl" => $shortUrl]);
@@ -151,7 +160,6 @@ class Shortener
 //            return null;
 //        }
 //    }
-
 
     /**
      * Get site tile:
@@ -163,58 +171,61 @@ class Shortener
      */
     protected function getSiteDescription($url)
     {
-        $siteTitle = null;
-        $header = null;
+        $siteDescription = null;
+        $agent = 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20100101 Firefox/17.0';;
+//        $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)';
 
-        // Make timeout if long request for title
-        try {
-            $opts = ['http' => ['header' => "User-Agent:MyAgent/1.0\r\n"]];
-            $context = \stream_context_create($opts);
-            $header = \file_get_contents($url, false, $context);
-        } catch (\Exception $Exception) {
-            $siteTitle = null;
-        }
+        $ch = \curl_init();
+        \curl_setopt($ch, CURLOPT_URL, $url);
+        \curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        \curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        $htmlData = \curl_exec($ch);
 
+        if (!\curl_errno($ch)) {
 
-        // Get page source
-        if (!$header) return false;
+            if (\strlen($htmlData) > 0) {
+                $res = preg_match('/<title>(.*)<\/title>/siU', $htmlData, $title_matches);
+                if (!$res) {
+                    return null;
+                } else {
+                    // Clean up title: remove EOL's and excessive whitespace.
+                    $title = \trim(\preg_replace('/\s+/', ' ', $title_matches[1]));
 
-        // @TODO ERROR!!!
-        // Адрес с лишним слешом выдает ошибку - http://developerslife.ru/1242/ !!!
-        // "file_get_contents(http://developerslife.ru/1242/): failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found"
+                    // If url not in utf-8 convert to utf-8
+                    if (mb_detect_encoding($title, 'UTF-8', true) === false) {
 
-        // Subtract title
-        if (preg_match("|<[s]*title[s]*>([^<]+)<[s]*/[s]*title[s]*>|Ui", $header, $t)) {
-            $siteTitle = trim($t[1]);
-        }
+                        /*
+                         * @TODO LANGUAGES
+                         * Big trouble with encoding
+                         * A lot of languages should be handle here
+                         */
 
-        if ($siteTitle) {
-            // If url not in utf-8 convert to utf-8
-            if (mb_detect_encoding($siteTitle, 'UTF-8', true) === false) {
+                        $encodedSiteTitle = \mb_convert_encoding($title, "utf-8", "windows-1251");
+                        $siteDescription = \mb_substr($encodedSiteTitle, 0, 300, 'UTF-8');
+                    } else {
+                        $siteDescription = \mb_substr(\trim($title), 0, 300, 'UTF-8');
+                    }
 
-                /*
-                 * @TODO LANGUAGES
-                 * Big trouble with encoding
-                 * A lot of languages should be handle here
-                 */
-
-                $encodedSiteTitle = \mb_convert_encoding($siteTitle, "utf-8", "windows-1251");
-                $siteTitle = \mb_substr(\trim($encodedSiteTitle), 0, 300, 'UTF-8');
-            } else {
-                $siteTitle = \mb_substr(\trim($siteTitle), 0, 300, 'UTF-8');
+                    return $siteDescription;
+                }
             }
         } else {
-            $siteTitle = $url;
+            return null;
         }
+        curl_close($ch);
 
-        return $siteTitle;
+          //@TODO Убрать HTML символы
+          // Адрес с лишним слешом выдает ошибку - http://developerslife.ru/1242/ !!!
+          // "file_get_contents(http://developerslife.ru/1242/): failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found"
+
     }
 
     /**
      * Validate url in two steps:
      * 1. Check length
-     * 2. Check structure
-     * 3. Trim and make url to lowercase
+     * 2. Trim and make url to lowercase
+     * 3. Check structure
      * 4. Check for Debris domain
      *
      * @param $url
@@ -222,51 +233,21 @@ class Shortener
      */
     protected function validateUrl($url)
     {
-        //@TODO колличество знаков, точно 1000?
-        //@TODO htmlspecialchars. Проверить правильно ли сожмет
-        //@TODO
-
         // Check if url string longer than 1000 symbols
         if (\mb_strlen($url, 'UTF-8') < 1000) {
 
-            // Check if it is correct url
-            if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $url)) {
+            // Cut spaces and make url to lowercase
+            $urlLowerCaseTrimmed = \trim(\mb_strtolower($url));
 
-                // Cut spaces and make url to lowercase
-                $urlFiltered = \trim(\mb_strtolower($url));
+            // Check if it is correct url
+            if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $urlLowerCaseTrimmed)) {
 
                 // Check if url has debris domain
-                if (\strpos($urlFiltered, "debris.dev")) {
+                if (\strpos($urlLowerCaseTrimmed, "debris.dev")) {
                     return 003;
                 } else {
-                    return $urlFiltered;
+                    return $urlLowerCaseTrimmed;
                 }
-
-                /*
-                    I decided do not send request for checking url existing
-                    //@TODO Exceptions
-                    } else {
-                        $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_USERAGENT, $agent);
-                        curl_setopt($ch, CURLOPT_URL, $url);
-                        curl_setopt($ch, CURLOPT_HEADER, true);
-                        curl_setopt($ch, CURLOPT_NOBODY, true);
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                        $document = curl_exec($ch);
-                        $response = \explode("\n", $document);
-
-                        if (\strpos($response[0], "200")) {
-                            return $url;
-                        } else {
-                            return 004;
-                        }
-                    }
-                */
-
             } else {
                 return 002;
             }
@@ -295,10 +276,9 @@ class Shortener
         $Url->setViews(0); // ????
         $Url->setHash($hash);
         $Url->setIp($userIp);
-        $Doctrine = Doctrine::getInstance();
         try {
-            $Doctrine->persist($Url);
-            $Doctrine->flush();
+            $this->Doctrine->persist($Url);
+            $this->Doctrine->flush();
             return null;
         } catch (\Exception $Exception) {
             $Error = new \Exception(\App\Libraries\Error\Code::CAN_NOT_SAVE);
