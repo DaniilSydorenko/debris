@@ -9,88 +9,110 @@
 
 {# Content #}
 {% block content %}
-    <!-- BEGIN Service title -->
-    <div class="row">
-        <div class="col-md-10 col-sm-10 col-xs-12 center-block animated slideInLeft">
-            <div class="url-snr-public-text">
-                <h4>Debris | {{ this.data.title }}</h4>
+    <!--  BEGIN Main content -->
+    <section class="debris-magic-box">
+        <div class="container">
+            <!-- BEGIN Service title -->
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-xs-12 center-block animated slideInLeft">
+                    <div class="url-snr-public-text">
+                        <h4>Debris | {{ this.data.title }}</h4>
+                    </div>
+                </div>
+            </div>
+            <!-- END Service title -->
+
+            <!-- BEGIN Main area -->
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-xs-12 center-block">
+                    <!-- BEGIN Form -->
+                    <form action="/" method="post" class="form-horizontal url-snr-form">
+                        <i class="fa fa-link"></i>
+
+                        <div id="urlfield" class="input-group">
+                            <input type="text" id="urlfield_url" name="urlfield[url]" required="required" class="form-control" placeholder="Enter your long URL">
+                            <span class="input-group-btn">
+                                <button type="submit" id="urlfield_Shorten" name="urlfield[Shorten]" class="btn btn-default">Shorten</button>
+                            </span>
+                        </div>
+                    </form>
+                    <!-- END Form -->
+
+                    <!-- BEGIN Result box -->
+                    <section class="url-snr-box" style="display: none">
+                        <div class="row">
+                            <div class="url-snr-url-valid">
+                                <div class="url-snr-box-srt col-md-5 col-sm-6 pull-left">
+                                    <h4 class="url-snr-header">Shorten URL</h4>
+
+                                    <div class="url-snr-box-content">
+                                        <i class="fa fa-link"></i>
+                                        <input type="text" class="form-control url-snr-short-url"
+                                               style="text-align: center">
+                                    </div>
+                                </div>
+                                <div class="url-snr-box-lng col-md-5 col-sm-6 pull-right">
+                                    <h4 class="url-snr-header">Original URL</h4>
+
+                                    <div class="url-snr-box-content">
+                                        <i class="fa fa-link"></i>
+                                        <input type="text" class="form-control url-snr-long-url" style="text-align: center">
+                                    </div>
+                                </div>
+                                <div class="url-snr-box-share col-md-12 col-sm-12">
+                                    <div class="url-snr-box-statistic" style="display: none">
+                                        <label for="url-statistic"></label>
+
+                                        <p id="url-statistic"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 col-sm-12 url-snr-url-invalid">
+                                <label for="url-snr-sad-img"></label>
+
+                                <div id="url-snr-sad-img">
+                                    <img src="/img/icons/sad-face-128.png" alt="Image" width="128" height="128">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- END Result box -->
+
+                </div>
+            </div>
+            <!-- End Main area -->
+        </div>
+    </section>
+
+    <section class="debris-goods">
+        <div class="row container">
+            <!-- RWD -->
+            <div class="col-md-4 col-sm-4">
+                <div class="glyph">
+                    <div class="fs1" aria-hidden="true" data-icon=""></div>
+                </div>
+                <h4>Responsive</h4>
+                <p>The complex filter is made up of a hit squad of filtering materials to absorb impurities, for optimal hydration.</p>
+            </div>
+            <!-- API -->
+            <div class="col-md-4 col-sm-4">
+                <div class="glyph">
+                    <div class="fs1" aria-hidden="true" data-icon=""></div>
+                </div>
+                <h4>API</h4>
+                <p>The complex filter is made up of a hit squad of filtering materials to absorb impurities, for optimal hydration.</p>
+            </div>
+            <!-- Free -->
+            <div class="col-md-4 col-sm-4">
+                <div class="glyph">
+                    <div class="fs1" aria-hidden="true" data-icon=""></div>
+                </div>
+                <h4>Free</h4>
+                <p>The complex filter is made up of a hit squad of filtering materials to absorb impurities, for optimal hydration.</p>
             </div>
         </div>
-    </div>
-    <!-- END Service title -->
-    <!-- BEGIN Main area -->
-    <div class="row">
-        <div class="col-md-10 col-sm-10 col-xs-12 center-block">
-            <!-- BEGIN Form -->
-            <form action="/" method="post" class="form-horizontal url-snr-form">
-                <i class="fa fa-link"></i>
-                <div id="urlfield">
-                    <div>
-                        <label class="hidden required" for="urlfield_url">Url</label>
-                        <input type="text" id="urlfield_url" name="urlfield[url]" required="required" class="form-control" placeholder="Enter your long URL">
-                    </div>
-                    <div>
-                        <button type="submit" id="urlfield_Shorten" name="urlfield[Shorten]" class="center-block-btn">Shorten</button>
-                    </div>
-                </div>
-            </form>
-            <!-- END Form -->
-            {#<div class="url-snr-error">#}
-            {#<span>Sorry, but uou URL is invalid :(</span>#}
-            {#</div>#}
-            <!-- BEGIN Result box -->
-            <section class="url-snr-box" style="display: none">
-                <div class="row">
-                    <div class="url-snr-url-valid">
-                        <div class="url-snr-box-srt col-md-5 col-sm-6 pull-left">
-                            <h4 class="url-snr-header">Shorten URL</h4>
-                            <div class="url-snr-box-content">
-                                <i class="fa fa-link"></i>
-                                <input type="text" class="form-control url-snr-short-url" style="text-align: center">
-                            </div>
-                        </div>
-                        <div class="url-snr-box-lng col-md-5 col-sm-6 pull-right">
-                            <h4 class="url-snr-header">Original URL</h4>
+    </section>
+    <!-- END Main content -->
 
-                            <div class="url-snr-box-content">
-                                <i class="fa fa-link"></i>
-                                <input type="text" class="form-control url-snr-long-url" style="text-align: center">
-                            </div>
-                        </div>
-                        <div class="url-snr-box-share col-md-12 col-sm-12">
-                            <div class="url-snr-box-statistic" style="display: none">
-                                <label for="url-statistic"></label>
-                                <p id="url-statistic"></p>
-                            </div>
-                            <label class="url-snr-label" for="url-snr-share-tools">Share with firends:</label>
-                            <div id="url-snr-share-tools footer-social-links" class="addthis_sharing_toolbox"
-                                 data-url="http://debrs.com/" data-title="Debris | URL Shortener">
-                                <div id="atstbx"
-                                     class="at-share-tbx-element addthis_20x20_style addthis-smartlayers addthis-animated at4-show">
-                                    <a class="at-share-btn at-svc-twitter"><span class="at4-icon aticon-twitter"
-                                                                                 title="Twitter"></span></a><a
-                                            class="at-share-btn at-svc-facebook"><span class="at4-icon aticon-facebook"
-                                                                                       title="Facebook"></span></a><a
-                                            class="at-share-btn at-svc-google_plusone_share"><span
-                                                class="at4-icon aticon-google_plusone_share" title="Google+"></span></a><a
-                                            class="at-share-btn at-svc-linkedin"><span class="at4-icon aticon-linkedin"
-                                                                                       title="LinkedIn"></span></a><a
-                                            class="at-share-btn at-svc-vk"><span class="at4-icon aticon-vk"
-                                                                                 title="VKontakte"></span></a></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12 col-sm-12 url-snr-url-invalid">
-                        <label for="url-snr-sad-img"></label>
-                        <div id="url-snr-sad-img">
-                            <img src="/img/icons/sad-face-128.png" alt="Image" width="128" height="128">
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- END Result box -->
-        </div>
-    </div>
-    <!-- End Main area -->
 {% endblock %}

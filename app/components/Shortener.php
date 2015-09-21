@@ -100,7 +100,6 @@ class Shortener
                     if (empty($siteDescription)) {
                         $siteDescription = $responseFromValidation;
                     }
-//                    print_r($siteDescription); die;
                     // If key is duplicated - generating new key till will find the original one
                     //                do {
                     //                    $duplicatedUrlKey = $this->duplicatedUrlKey($shortUrl, $rootPath);

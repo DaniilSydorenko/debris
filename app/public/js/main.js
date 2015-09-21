@@ -1,25 +1,29 @@
-/* Set form in the center of page */
-function windowResizer() {
-    $(window).resize(function() {
-        $('#top_intro').height($(window).height() - 1);
+/**
+ * Animated header
+ */
+$(function() {
+
+    // Hight
+    var shrinkHeader = 30;
+    $(window).scroll(function () {
+        var scroll = getCurrentScroll();
+        if (scroll >= shrinkHeader) {
+            $('.navbar').addClass('shrink');
+        }
+        else {
+            $('.navbar').removeClass('shrink');
+        }
     });
-    $(window).trigger('resize');
-}
 
-/* Navbar elements decorative line */
-//function navbarElementsLine() {
-//    if ($("body").hasClass("url-snr")) {
-//        $(".line-snr").animate(
-//            { width: '143px' },
-//        "slow");
-//    } else if ($("body").hasClass("fie-psr")) {
-//        $(".line-extr").animate(
-//            { width: '115px' },
-//        "slow");
-//    }
-//}
+    /**
+     * Get current scroll hight
+     */
+    function getCurrentScroll() {
+        return window.pageYOffset || document.documentElement.scrollTop;
+    }
+});
 
-/* Set bootstrap style for file input */
+    /* Set bootstrap style for file input */
 function inputFileStyle() {
     $(":file").filestyle(
         { icon: true }
@@ -53,9 +57,7 @@ $(document).ready(function(){
 
     // @TODO: Separate url. parse and common
 
-    windowResizer();
-    inputFileStyle();
-    //setQtip();
+    //setQtip(); ????
 
     var myRegExp =/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
 

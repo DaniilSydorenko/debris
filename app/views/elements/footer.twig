@@ -1,10 +1,28 @@
             {# Footer #}
-            </section>
-            <!-- END Main content -->
             <!-- BEGIN Footer -->
             <footer class="footer">
                 <div class="container">
-                    <p class="text-muted"><a href="https://about.me/dsydorenko" target="_blank" title="By Daniil Sydorenko">By Daniil Sydorenko</a> &copy;{{ "now"|date("Y") }}</p>
+                    <div class="social-bar">
+                        <div class="pull-left">
+                            <p class="text-muted copyright"><a href="https://about.me/dsydorenko" target="_blank" title="By Daniil Sydorenko">&copy; Daniil Sydorenko</a> {{ "now"|date("Y") }}</p>
+                            <p class="email">
+                                <a href="mailto:daniildeveloper@gmail.com">daniildeveloper@gmail.com</a>
+                            </p>
+                        </div>
+
+                        <div class="pull-right">
+                            {#<div class="social-header">#}
+                                {#<p>I am in social networks</p>#}
+                            {#</div>#}
+                            <div class="social-nav pull-left">
+                                <ul>
+                                    <li><a class="no-fade" href="https://twitter.com/drinkcove" target="_blank"><div class="fs1" aria-hidden="true" data-icon=""></div></a></li>
+                                    <li><a class="no-fade" href="https://instagram.com/drinkcove/" target="_blank"><div class="fs1" aria-hidden="true" data-icon=""></div></a></li>
+                                    <li><a class="no-fade" href="https://www.facebook.com/drinkcove" target="_blank"><span aria-hidden="true" class="social_facebook_circle"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </footer>
             <!-- END Footer -->
@@ -14,6 +32,5 @@
         <!-- JavaScript
         ================================================== -->
         <script src="/js/vendor/bootstrap.min.js" type="text/javascript"></script>
-        <script src="/js/vendor/bootstrap.filestyle.min.js" type="text/javascript"></script>
     </body>
 </html>
