@@ -55,6 +55,80 @@ function setQtip() {
 /* Load all JS functions */
 $(document).ready(function(){
 
+    $('.glyph').click(function(){
+        //
+        //var data = $(this).data("type");
+        //
+        //if ($(this).not('.active')) {
+        //        $('.glyph').removeClass("active");
+        //        $(this).addClass("active");
+        //
+        //    $('.goods-description').animate({
+        //        height: "150"
+        //    }, 500);
+        //    $('.desc').toggleClass('active', false);
+        //    $('.goods-description' + ' > .' + data).toggleClass('active',true);
+        //} else {
+        //    $(this).removeClass("active");
+        //
+        //    $('.desc').hide();
+        //    $('.goods-description' + ' > .' + data).show();
+        //}
+
+
+
+
+
+
+        //var data = $(this).data("type");
+        //
+        //if ($(this).hasClass("active") === true) {
+        //    $(this).removeClass("active");
+        //
+        //    $('.goods-description' + ' > .' + data).animate({
+        //        height: "0"
+        //    }, 500 , function() {
+        //        $('.goods-description' + ' > .' + data).hide();
+        //        $('.goods-description').hide();
+        //    });
+        //
+        //} else {
+        //    $('.glyph').removeClass("active");
+        //    $(this).addClass("active");
+        //
+        //    $('.goods-description').show();
+        //    $('.goods-description' + ' > .' + data).show();
+        //    $('.goods-description' + ' > .' + data).animate({
+        //        height: "150"
+        //    }, 500);
+
+        //}
+        //$('.glyph').toggle(
+        //    function(){
+        //        $('#panel').animate({
+        //            height: "150",
+        //            padding:"20px 0",
+        //            backgroundColor:'#000000',
+        //            opacity:.8
+        //        }, 500);
+        //        $('#otherdiv').animate({
+        //            //otherdiv properties here
+        //        }, 500);
+        //    },
+        //    function(){
+        //        $('#panel').animate({
+        //            height: "0",
+        //            padding:"0px 0",
+        //            opacity: 1
+        //        }, 500);
+        //        $('#otherdiv').animate({
+        //            //otherdiv properties here
+        //        }, 500);
+        //    });
+    });
+
+
+
     // @TODO: Separate url. parse and common
 
     //setQtip(); ????

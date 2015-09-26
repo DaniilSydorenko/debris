@@ -33,15 +33,20 @@ Author:         Daniil Sydorenko daniildeveloper@gmail.com
     margin-top: 100px;
 }
 
-/* Header
-------------------------------------------------------------------------------*/
 
+/* Links */
+a {
+    text-decoration: none !important;
+}
+
+/* Buttons */
 button {
     background: #fff;
     border: 1px solid #ccc;
     display: inline-block;
     padding: 7px 32px;
     border-radius: 2px;
+    outline: none;
 }
 
 button:hover {
@@ -53,6 +58,16 @@ button:hover {
     -moz-transition: .5s;
     -webkit-transition: .5s;
     transition: .5s;
+}
+
+button:active,
+button:focus {
+    outline: none !important;
+}
+
+.btn:active,
+.btn:focus {
+    outline: none !important;
 }
 
 button:disabled {
@@ -93,9 +108,8 @@ button:disabled {
     background-color: #92dce0;
 }
 
-/* Header */
-
-
+/* Header
+------------------------------------------------------------------------------*/
 .navbar {
     background: #FFFFFF !important;
     font-size: 14px;
@@ -144,7 +158,8 @@ button:disabled {
     transition: all .2s ease-in-out;
 }
 
-/* Content */
+/* Content
+------------------------------------------------------------------------------*/
 .center-block {
     margin-left: auto !important;
     margin-right: auto !important;
@@ -181,13 +196,15 @@ button:disabled {
     line-height: 14px;
 }
 
-/* Form*/
+/* Form
+------------------------------------------------------------------------------*/
 .debris-magic-box form #urlfield_url { height: 54px; }
 .debris-magic-box form > i { position: absolute; padding: 19px; z-index: 100; }
 .debris-magic-box form #urlfield .form-control { padding: 6px 12px 6px 42px; }
-
 .debris-magic-box .btn {
     height: 54px;
+    text-transform: uppercase;
+    font-size: 13px;
 }
 
 /* URL-SNR Box */
@@ -225,7 +242,8 @@ button:disabled {
     width: auto;
 }
 
-/* Section Goods */
+/* Section Goods
+------------------------------------------------------------------------------*/
 .debris-goods {
     background: #f6f8f9;
 }
@@ -235,7 +253,30 @@ button:disabled {
     margin: 0 auto;
 }
 
-/*  */
+
+.debris-goods .learn-more {
+    padding-top: 40px;
+}
+
+.debris-goods .learn-more .btn-default {
+    background-color: transparent;
+    padding: 12px 30px;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.debris-goods .learn-more .btn-default:hover {
+    background: #e9f0f5;
+}
+
+.debris-goods .learn-more > div {
+    background: url('../img/learn_more.gif') 0 0 repeat-x;
+    padding-top: 23px;
+    margin-top: 70px;
+}
+
+/* Debris goods icons
+------------------------------------------------------------------------------*/
 .glyph {
     margin: 0 auto;
     border-radius: 50%;
@@ -255,14 +296,55 @@ button:disabled {
     color: #111;
 }
 
-/* Footer */
+.glyph.active {
+    background: #cfe8f5;
+    color: #111;
+}
+
+
+.debris-learn-more {}
+
+.debris-learn-more .goods-description {
+    height: 0;
+
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+/*.debris-goods .goods-description > .rwd,*/
+/*.debris-goods .goods-description > .api,*/
+/*.debris-goods .goods-description > .free {*/
+/*height: 0;*/
+/*display: none;*/
+/*}*/
+
+.debris-learn-more .goods-description .desc {
+    height: 0;
+    display: none;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.debris-learn-more .goods-description .desc.active {
+    display: block;
+    height: 150px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+
+/* Footer
+------------------------------------------------------------------------------*/
 .footer {
     width: 100%;
     min-height: 50px;
     text-align: center;
     background-color: #FFFFFF;
     font-size: 14px;
-    padding-top: 50px;
+    padding: 50px 0;
     text-transform: uppercase;
 }
 
@@ -292,8 +374,86 @@ button:disabled {
 }
 
 .footer .social-nav ul li a {
-    font-size: 22px;;
+    font-size: 22px;
     color: #92ACBF;
+
+    /* Firefox */
+    -moz-transition: all .6s ease;
+    /* WebKit */
+    -webkit-transition: all .6s ease;
+    /* Opera */
+    -o-transition: all .6s ease;
+    /* Standard */
+    transition: all .6s ease;
+
+    border: 1px solid #e1e1e1;
+    padding: 4px 9px;
+}
+.footer .social-nav ul li a:hover {
+    /* Firefox */
+    -moz-transition: all .6s ease;
+    /* WebKit */
+    -webkit-transition: all .6s ease;
+    /* Opera */
+    -o-transition: all .6s ease;
+    /* Standard */
+    transition: all .6s ease;
+
+    opacity: 1;
+
+    /* Firefox */
+    -moz-transform: scale(1) rotate(360deg);
+    /* WebKit */
+    -webkit-transform: scale(1) rotate(360deg);
+    /* Opera */
+    -o-transform: scale(1) rotate(360deg);
+    /* Standard */
+    transform: scale(1) rotate(360deg);
+
+    z-index: 1000;
+    color: #CCCCCC;
+}
+
+
+/* Shorthand version */
+.menu-item {
+    position: relative;
+    display: inline-block;
+    border: 1px dashed #000;
+    padding: 10px;
+    background: #ffffa2;
+    height: 20px;
+    opacity: 0.3;
+    text-decoration: none;
+
+    /* Firefox */
+    -moz-transition: all .6s ease;
+    /* WebKit */
+    -webkit-transition: all .6s ease;
+    /* Opera */
+    -o-transition: all .6s ease;
+    /* Standard */
+    transition: all .6s ease;
+}
+
+.menu-item:hover {
+    opacity: 1;
+
+    /* Firefox */
+    -moz-transform: scale(2) rotate(360deg) translate(50px);
+    /* WebKit */
+    -webkit-transform: scale(1.2) rotate(360deg) translate(50px);
+    /* Opera */
+    -o-transform: scale(2) rotate(360deg) translate(50px);
+    /* Standard */
+    transform: scale(2) rotate(360deg) translate(50px);
+
+    z-index: 1000;
+}
+
+#panel {
+    width: 100%;
+    height: 200px;
 }
 
 /* ==========================================================================
