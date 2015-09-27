@@ -29,8 +29,14 @@ Author:         Daniil Sydorenko daniildeveloper@gmail.com
    Custom styles
    ========================================================================== */
 
+html {
 
+}
 
+body {
+    font: 13px/1.1em RobotoLight, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #777777;
+}
 
 /* Links */
 a {
@@ -52,7 +58,6 @@ button:hover {
     color: white;
     border-color: #aaa;
     -o-transition: .5s;
-    -ms-transition: .5s;
     -moz-transition: .5s;
     -webkit-transition: .5s;
     transition: .5s;
@@ -69,16 +74,13 @@ button:focus {
 }
 
 button:disabled {
-    background-color: #DDD!important;
+    background: #DDDDDD none !important;
     cursor: default;
     color: rgba(0,0,0,.5)!important;
     opacity: .3!important;
-    background-image: none!important;
     -webkit-box-shadow: none!important;
     box-shadow: none!important;
-
     -o-transition: .5s;
-    -ms-transition: .5s;
     -moz-transition: .5s;
     -webkit-transition: .5s;
 }
@@ -126,34 +128,36 @@ button:disabled {
 }
 
 .navbar.shrink .navbar-brand {
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
     font-size: 22px !important;
 }
 
+.navbar.shrink .about-me > a {
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    font-size: 13px !important;
+}
+
+
 .navbar-brand {
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
     font-size: 30px !important;
 }
 
-.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover { font-size: 30px; }
-.navbar .container { background-color: #ffffff; }
-.navbar-default { background-color: transparent; border: 1px solid #f5f5f5; }
-.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover { background-color: transparent; }
-#navbar > ul { position: relative; left: 40px; }
-#navbar > ul > li > a { text-transform: uppercase; padding-right: 70px; padding-top: 19px; }
-
-.dropdown .dropdown-toggle {
+.navbar .about-me {
+    text-transform: uppercase;
+    padding-right: 70px;
+    padding-top: 19px;
     cursor: pointer;
 }
 
-.dropdown-menu {
-    box-shadow: none !important;
-}
-
-.dropdown:hover .dropdown-menu {
-    display: block;
-    -webkit-transition: all .2s ease-in-out;
-    -moz-transition: all .2s ease-in-out;
-    -o-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
+.navbar .about-me > a {
+    color: #777777 !important;
 }
 
 /* Content
@@ -196,10 +200,29 @@ button:disabled {
 
 /* Form
 ------------------------------------------------------------------------------*/
-.debris-magic-box form #urlfield_url { height: 54px; }
-.debris-magic-box form > i { position: absolute; padding: 19px; z-index: 100; }
-.debris-magic-box form #urlfield .form-control { padding: 6px 12px 6px 42px; }
-.debris-magic-box .btn {
+.debris-magic-box form .form-control {
+    box-shadow: none;
+    height: 54px;
+}
+
+.debris-magic-box form  .form-control:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+}
+
+.debris-magic-box form > i {
+    position: absolute;
+    padding: 19px;
+    z-index: 100;
+}
+
+.debris-magic-box form #urlfield .form-control {
+    padding: 6px 12px 6px 42px;
+}
+
+.debris-magic-box form .btn {
     height: 54px;
     text-transform: uppercase;
     font-size: 13px;
@@ -253,6 +276,7 @@ button:disabled {
 
 
 .debris-goods .learn-more {
+    display: none;
     padding-top: 40px;
 }
 
@@ -350,7 +374,6 @@ button:disabled {
 
 .footer .social-bar .email a:hover {
     transition: all 0.4s linear;
-    text-decoration: none;
 }
 
 .footer .social-nav ul {
@@ -366,13 +389,11 @@ button:disabled {
 
 .footer .social-nav ul li a {
     font-size: 22px;
-    color: #92ACBF;
-
+    color: #9FB5C5;
     -moz-transition: all .6s ease;
     -webkit-transition: all .6s ease;
     -o-transition: all .6s ease;
     transition: all .6s ease;
-
     border: 1px solid #e1e1e1;
     padding: 4px 9px;
 }
@@ -381,16 +402,22 @@ button:disabled {
     -webkit-transition: all .6s ease;
     -o-transition: all .6s ease;
     transition: all .6s ease;
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+}
 
-    opacity: 1;
+.footer .social-nav ul li a.twitter:hover {
+    color: #5EA9DD;
+}
 
-    -moz-transform: scale(1) rotate(360deg);
-    -webkit-transform: scale(1) rotate(360deg);
-    -o-transform: scale(1) rotate(360deg);
-    transform: scale(1) rotate(360deg);
+.footer .social-nav ul li a.facebook:hover {
+    color: #49659F;
+}
 
-    z-index: 1000;
-    color: #CCCCCC;
+.footer .social-nav ul li a.linkedin:hover {
+    color: #0C7AB6;
 }
 
 

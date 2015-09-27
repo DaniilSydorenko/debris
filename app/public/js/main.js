@@ -4,7 +4,7 @@
 $(function() {
 
     // Hight
-    var shrinkHeader = 30;
+    var shrinkHeader = 60;
     $(window).scroll(function () {
         var scroll = getCurrentScroll();
         if (scroll >= shrinkHeader) {
@@ -22,14 +22,6 @@ $(function() {
         return window.pageYOffset || document.documentElement.scrollTop;
     }
 });
-
-    /* Set bootstrap style for file input */
-function inputFileStyle() {
-    $(":file").filestyle(
-        { icon: true }
-    );
-    $('input[type="text"]').attr('disabled', false);
-}
 
 /* Set Qtip on fields */
 function setQtip() {
