@@ -172,7 +172,6 @@ class Shortener
     {
         $siteDescription = null;
         $agent = 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20100101 Firefox/17.0';;
-//        $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)';
 
         $ch = \curl_init();
         \curl_setopt($ch, CURLOPT_URL, $url);
@@ -216,14 +215,12 @@ class Shortener
 
           //@TODO Убрать HTML символы
           // Адрес с лишним слешом выдает ошибку - http://developerslife.ru/1242/ !!!
-          // "file_get_contents(http://developerslife.ru/1242/): failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found"
-
     }
 
     /**
      * Validate url in two steps:
      * 1. Check length
-     * 2. Trim and make url to lowercase
+     * 2. Trim url
      * 3. Check structure
      * 4. Check for Debris domain
      *
@@ -235,17 +232,17 @@ class Shortener
         // Check if url string longer than 1000 symbols
         if (\mb_strlen($url, 'UTF-8') < 1000) {
 
-            // Cut spaces and make url to lowercase
-            $urlLowerCaseTrimmed = \trim(\mb_strtolower($url));
+            // Cut spaces
+            $urlClear = \trim($url);
 
             // Check if it is correct url
-            if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $urlLowerCaseTrimmed)) {
+            if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $urlClear)) {
 
                 // Check if url has debris domain
-                if (\strpos($urlLowerCaseTrimmed, "debris.dev")) {
+                if (\strpos($urlClear, "debris.dev")) {
                     return 003;
                 } else {
-                    return $urlLowerCaseTrimmed;
+                    return $urlClear;
                 }
             } else {
                 return 002;
@@ -272,7 +269,6 @@ class Shortener
         $Url->setUrl($url);
         $Url->setShortUrl($shortUrl);
         $Url->setDescription($description);
-        $Url->setViews(0); // ????
         $Url->setHash($hash);
         $Url->setIp($userIp);
         try {

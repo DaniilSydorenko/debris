@@ -74,7 +74,7 @@ class Shortener extends \Gaia\Controllers\JSON
     public function setEndpoint($endpoint)
     {
         $apiEndpoint = \explode('/', \rtrim($endpoint, '/'));
-        $this->endpoint = \strtolower($apiEndpoint[2]);
+        $this->endpoint = $apiEndpoint[2];
     }
 
     /**
@@ -108,11 +108,15 @@ class Shortener extends \Gaia\Controllers\JSON
         header("Access-Control-Allow-Methods: *");
         header("Content-Type: application/json");
 
+//        print_r($this->getRequest()->getParameters()); die;
+
         // Set request method
         $this->setMethod($_SERVER['REQUEST_METHOD']);
 
         // Set request arguments
         $this->setArgs((array)$this->getRequest()->getParameters());
+
+//        print_r($this->getArgs()); die;
 
         // Set API endpoint
         $this->setEndpoint($this->getRequest()->getURI());
@@ -124,8 +128,10 @@ class Shortener extends \Gaia\Controllers\JSON
                 if ($this->getEndpoint() == "short") {
                     $this->_response('OK', 200);
                     $requestData = $this->_cleanInputs($this->getArgs());
+//                            print_r($requestData); die;
+
                     $ShortenerComponent = new ShortenerComponent();
-                    $shortenUrl = $ShortenerComponent->shortenUrl($requestData['url']);
+                    $shortenUrl = $ShortenerComponent->shortenUrl($requestData);
                     return $shortenUrl;
                 } else {
                     $this->_response('Invalid Path', 400);
@@ -171,15 +177,22 @@ class Shortener extends \Gaia\Controllers\JSON
      */
     private function _cleanInputs($data)
     {
+        // @TODO - Eto pizdec
+
+//        http://otomoto.pl/osobowe/audi/?search%5Bfilter_float_year%3Afrom%5D=2010&search%5Bfilter_enum_fuel_type%5D%5B0%5D=petrol-cng&search%5Bfilter_enum_country_origin%5D%5B0%5D=a
+
         $clean_input = [];
+        $res = '';
         if (\is_array($data)) {
             foreach ($data as $k => $v) {
-                $clean_input[$k] = $this->_cleanInputs($v);
+//                $clean_input[$k] = $this->_cleanInputs($v);
+                $res .= ($k . "=" . $v) . "&";
             }
         } else {
-            $clean_input = \strtolower(\trim(\strip_tags($data)));
+            $clean_input = \trim(\strip_tags($data));
         }
-        return $clean_input;
+
+        return \substr(\rtrim($res, "&"), 4);
     }
 
     /**

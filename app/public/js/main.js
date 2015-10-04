@@ -202,18 +202,40 @@ $(document).ready(function(){
                     'data': {url: $urlInput.val()},
                     'success': function (data)
                     {
-                        var shortUrl = data.data.shortUrl;
-                        var longUrl = data.data.longUrl;
-                        var urlViews = data.data.urlViews;
+                        var shortUrl = data.data.shortUrl,
+                            longUrl = data.data.longUrl,
+                            urlViews = data.data.urlViews,
+                            urlDescription = data.data.description;
 
                         //if (shortUrl) {
 
-                            $("form.url-snr-form").hide();
+                            $("form.url-snr-form input").val('');
                             $(".url-snr-box").slideUp().fadeIn();
                             if (shortUrl.toLowerCase().indexOf("http://") >= 0) {
-                                $(".url-snr-short-url").val(shortUrl);
-                                $(".url-snr-long-url").val(longUrl);
-                                $("#url-statistic").text(urlViews);
+
+                                // @TODO REMOVE BEFORE
+
+                                $(".url-snr-box-content").empty();
+
+                                // Create short link
+                                var shortLink = $("<a></a>")
+                                    .addClass("url-snr-short-url")
+                                    .attr("href", shortUrl)
+                                    .text(shortUrl);
+                                $(".url-snr-box-srt .url-snr-box-content").append(shortLink);
+
+                                // Create long link
+                                var longLink = $("<a></a>")
+                                    .addClass(".url-snr-long-url")
+                                    .attr("href", longUrl)
+                                    .text(urlDescription);
+                                $(".url-snr-box-lng .url-snr-box-content").append(longLink);
+
+
+                                //$(".url-snr-short-url").text(shortUrl);
+                                //$(".url-snr-long-url").text(longUrl);
+                                //$("#url-statistic").text(urlViews);
+
                             } else {
                                 $(".url-snr-url-valid").hide();
                                 $('label[for="url-snr-sad-img"]').text(shortUrl);
