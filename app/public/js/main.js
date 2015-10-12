@@ -2,12 +2,9 @@
  * Animated header
  */
 $(function() {
-
-    // Hight
-    var shrinkHeader = 60;
     $(window).scroll(function () {
         var scroll = getCurrentScroll();
-        if (scroll >= shrinkHeader) {
+        if (scroll >= 60) {
             $('.navbar').addClass('shrink');
         }
         else {
@@ -24,106 +21,30 @@ $(function() {
 });
 
 /* Set Qtip on fields */
-function setQtip() {
-    $('form input[name*="urlfield[url]"]').each(function() {
-        $(this).qtip({
-            content: {
-                text: 'Type your url with \'http://\''
-            },
-            style: {
-                name: 'dark',
-                tip: true
-            },
-            show: {
-                effect: {
-                    type: 'slide',
-                    length: 500
-                }
-            }
-        });
-    });
-}
+//function setQtip() {
+//    $('form input[name*="urlfield[url]"]').each(function() {
+//        $(this).qtip({
+//            content: {
+//                text: 'Type your url with \'http://\''
+//            },
+//            style: {
+//                name: 'dark',
+//                tip: true
+//            },
+//            show: {
+//                effect: {
+//                    type: 'slide',
+//                    length: 500
+//                }
+//            }
+//        });
+//    });
+//}
 
 /* Load all JS functions */
 $(document).ready(function(){
 
-    $('.glyph').click(function(){
-        //
-        //var data = $(this).data("type");
-        //
-        //if ($(this).not('.active')) {
-        //        $('.glyph').removeClass("active");
-        //        $(this).addClass("active");
-        //
-        //    $('.goods-description').animate({
-        //        height: "150"
-        //    }, 500);
-        //    $('.desc').toggleClass('active', false);
-        //    $('.goods-description' + ' > .' + data).toggleClass('active',true);
-        //} else {
-        //    $(this).removeClass("active");
-        //
-        //    $('.desc').hide();
-        //    $('.goods-description' + ' > .' + data).show();
-        //}
-
-
-
-
-
-
-        //var data = $(this).data("type");
-        //
-        //if ($(this).hasClass("active") === true) {
-        //    $(this).removeClass("active");
-        //
-        //    $('.goods-description' + ' > .' + data).animate({
-        //        height: "0"
-        //    }, 500 , function() {
-        //        $('.goods-description' + ' > .' + data).hide();
-        //        $('.goods-description').hide();
-        //    });
-        //
-        //} else {
-        //    $('.glyph').removeClass("active");
-        //    $(this).addClass("active");
-        //
-        //    $('.goods-description').show();
-        //    $('.goods-description' + ' > .' + data).show();
-        //    $('.goods-description' + ' > .' + data).animate({
-        //        height: "150"
-        //    }, 500);
-
-        //}
-        //$('.glyph').toggle(
-        //    function(){
-        //        $('#panel').animate({
-        //            height: "150",
-        //            padding:"20px 0",
-        //            backgroundColor:'#000000',
-        //            opacity:.8
-        //        }, 500);
-        //        $('#otherdiv').animate({
-        //            //otherdiv properties here
-        //        }, 500);
-        //    },
-        //    function(){
-        //        $('#panel').animate({
-        //            height: "0",
-        //            padding:"0px 0",
-        //            opacity: 1
-        //        }, 500);
-        //        $('#otherdiv').animate({
-        //            //otherdiv properties here
-        //        }, 500);
-        //    });
-    });
-
-
-
     // @TODO: Separate url. parse and common
-
-    //setQtip(); ????
 
     var myRegExp =/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
 

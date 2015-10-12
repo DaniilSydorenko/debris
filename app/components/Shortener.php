@@ -11,15 +11,12 @@ namespace App\Components;
 
 use Gaia\Components\ORM\Doctrine;
 use App\Entities\Url;
-
 use App\Components\Session as SessionComponent;
 
 /**
  * Shortener class
  *
  * @TODO Кирилица в описании
- * @TODO Дубликация ключей
- * @TODO Сессия в Main и провер ка в JSON - а надо???
  *
  */
 class Shortener
@@ -79,17 +76,18 @@ class Shortener
             default:
 
                 // Try to find url
-                $Url = $this->Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $responseFromValidation]);
+                $Url = $this->Doctrine->getRepository("App\\Models\\Url")->findOneBy([
+                    "url" => $responseFromValidation
+                ]);
 
                 if ($Url instanceof \App\Entities\Url) {
-
+                    // Add short url to cookie
                     SessionComponent::getInstance(null, $Url->getShortUrl());
-
                     return $response = [
-                        'shortUrl' => $Url->getShortUrl(),
+                        'shortUrl'    => $Url->getShortUrl(),
                         'description' => $Url->getDescription(),
-                        'longUrl' => $responseFromValidation,
-                        'urlViews' => $Url->getViews()
+                        'longUrl'     => $responseFromValidation,
+                        'urlViews'    => $Url->getViews()
                     ];
                 } else {
 
@@ -99,21 +97,13 @@ class Shortener
                     // Set short url key
                     $shortUrl = $rootPath . \substr(md5(uniqid(rand(), 1)), 0, 4);
 
-                    //@TODO Здесь получше проверять title?
                     // Get url description and set no more than 300 symbols in UTF-8 and trim from spaces
                     $siteDescription = $this->getSiteDescription($responseFromValidation);
-                    if (empty($siteDescription)) {
+                    if (empty($siteDescription) && mb_strlen($siteDescription) > 300) {
                         $siteDescription = $responseFromValidation;
                     }
-                    // If key is duplicated - generating new key till will find the original one
-                    //                do {
-                    //                    $duplicatedUrlKey = $this->duplicatedUrlKey($shortUrl, $rootPath);
-                    //                    if (!$duplicatedUrlKey) {
-                    //                        break;
-                    //                    }
-                    //                } while ($duplicatedUrlKey);
 
-                    // Set hash(for future, maybe a password ??)
+                    // Set hash (for future pass)
                     $hash = \sha1(\md5(\uniqid()));
 
                     // Miscellaneous::getClientIp()  ??????
@@ -138,8 +128,10 @@ class Shortener
                     $result = $this->setShortUrl($responseFromValidation, $shortUrl, $siteDescription, $hash, $userIp);
                     $responseResult = (empty($result)) ? $shortUrl : $result;
 
-                    SessionComponent::getInstance(null, $responseResult);
-
+                    // Add short url to cookie
+                    if (\strpos($responseResult, "dbrs")) {
+                        SessionComponent::getInstance(null, $responseResult);
+                    }
 
                     return $response = [
                         'shortUrl' => $responseResult,
@@ -292,8 +284,6 @@ class Shortener
             return $Error->getMessage();
         }
     }
-
-
 
     /**
      * Method: _requestStatus
