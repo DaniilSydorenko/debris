@@ -153,7 +153,7 @@ $(document).ready(function(){
         }
     });
 
-    $('.url-snr-form').on('submit', function (e) {
+    $('.dbrs-form').on('submit', function (e) {
         var event = e || window.event;
         event.stopPropagation();
 
@@ -178,17 +178,17 @@ $(document).ready(function(){
             // to lowercase
             // rtrim / ??
 
-            $("form.url-snr-form").hide();
-            $(".url-snr-box").fadeIn("slow");
+            $("form.dbrs-form").hide();
+            $(".dbrs-box").fadeIn("slow");
 
-            $(".url-snr-url-valid").hide();
-            $('label[for="url-snr-sad-img"]').text("Sorry, but your url is invalid!");
-            $(".url-snr-url-invalid").slideUp().fadeIn();
+            $(".dbrs-url-valid").hide();
+            $('label[for="dbrs-sad-img"]').text("Sorry, but your url is invalid!");
+            $(".dbrs-url-invalid").slideUp().fadeIn();
 
             setTimeout(function () {
                 //$element.css(errorColors);
                 //$button.prop("disabled", true);
-                $(".url-snr-error").fadeIn();
+                $(".dbrs-error").fadeIn();
             }, 300);
 
             //$submit.prop("disabled", true);
@@ -209,44 +209,44 @@ $(document).ready(function(){
 
                         //if (shortUrl) {
 
-                            $("form.url-snr-form input").val('');
-                            $(".url-snr-box").slideUp().fadeIn();
+                            $("form.dbrs-form input").val('');
+                            $(".dbrs-box").slideUp().fadeIn();
                             if (shortUrl.toLowerCase().indexOf("http://") >= 0) {
 
                                 // @TODO REMOVE BEFORE
 
-                                $(".url-snr-box-content").empty();
+                                $(".dbrs-box-content-res").empty();
 
                                 // Create short link
                                 var shortLink = $("<a></a>")
-                                    .addClass("url-snr-short-url")
+                                    .addClass("dbrs-short-url")
                                     .attr("href", shortUrl)
                                     .text(shortUrl);
-                                $(".url-snr-box-srt .url-snr-box-content").append(shortLink);
+                                $(".dbrs-box-srt-res .dbrs-box-content-res").append(shortLink);
 
                                 // Create long link
                                 var longLink = $("<a></a>")
-                                    .addClass(".url-snr-long-url")
+                                    .addClass(".dbrs-long-url")
                                     .attr("href", longUrl)
                                     .text(urlDescription);
-                                $(".url-snr-box-lng .url-snr-box-content").append(longLink);
+                                $(".dbrs-box-lng-res .dbrs-box-content-res").append(longLink);
 
 
-                                //$(".url-snr-short-url").text(shortUrl);
-                                //$(".url-snr-long-url").text(longUrl);
+                                //$(".dbrs-short-url").text(shortUrl);
+                                //$(".dbrs-long-url").text(longUrl);
                                 //$("#url-statistic").text(urlViews);
 
                             } else {
-                                $(".url-snr-url-valid").hide();
-                                $('label[for="url-snr-sad-img"]').text(shortUrl);
-                                $(".url-snr-url-invalid").slideUp().fadeIn();
+                                $(".dbrs-url-valid").hide();
+                                $('label[for="dbrs-sad-img"]').text(shortUrl);
+                                $(".dbrs-url-invalid").slideUp().fadeIn();
                                 $submit.attr('disabled', 'true');
 
                                 setTimeout(function () {
-                                    $(".url-snr-url-valid").hide();
+                                    $(".dbrs-url-valid").hide();
                                     //$element.css(errorColors);
                                     //$button.prop("disabled", true);
-                                    $(".url-snr-error").fadeIn();
+                                    $(".dbrs-error").fadeIn();
                                 }, 300);
                             }
                         //}

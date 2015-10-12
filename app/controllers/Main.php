@@ -8,6 +8,7 @@
 
 // Default namespace
 namespace App;
+use App\Components\Session;
 
 
 /**
@@ -16,10 +17,21 @@ namespace App;
 class Main extends \Gaia\Controllers\Twig
 {
 
+
+
     /**
      * @param null $key
      */
     public function show($key = null) {
+
+        $Session = Session::getInstance();
+
+        $formattedLatestUrls = $Session->getLatestUrls();
+
+        $usersLatetUrls = (!empty($formattedLatestUrls) && \is_array($formattedLatestUrls)) ? $formattedLatestUrls : null;
+
+//        var_dump($usersLatetUrls); die;
+
         $key = $this->getRequest()->getURI();
 
         // 404
@@ -34,6 +46,7 @@ class Main extends \Gaia\Controllers\Twig
         // Assign content
         $this->assign("data", [
             "title"   => "URL SHortener",
+            "latestUrls" => $usersLatetUrls
         ]);
 
         if (!$key) {
@@ -87,7 +100,7 @@ class Main extends \Gaia\Controllers\Twig
      * @param Entities\Url $Url
      * @return null|string
      */
-    protected function setUrlViews(\App\Entities\Url $Url)
+    private function setUrlViews(\App\Entities\Url $Url)
     {
         // Get entity manager
         $EM = $this->getDoctrine()->getEntityManager();
@@ -103,4 +116,5 @@ class Main extends \Gaia\Controllers\Twig
             return $Error->getMessage();
         }
     }
+
 }

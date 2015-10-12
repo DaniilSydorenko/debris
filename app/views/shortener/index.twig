@@ -5,18 +5,18 @@
 {% block title %}{{ this.data.title }}{% endblock %}
 
 {# Body class #}
-{% set bodyClass = 'url-snr' %}
+{% set bodyClass = 'dbrs' %}
 
 {# Content #}
 {% block content %}
     <!--  BEGIN Main content -->
-    <section class="debris-magic-box">
+    <section class="dbrs-magic-box">
         <div class="container">
             <!-- BEGIN Service title -->
             <div class="row">
                 <div class="col-md-10 col-sm-10 col-xs-12 center-block animated slideInLeft">
-                    <div class="url-snr-public-text">
-                        <h4>Debris | {{ this.data.title }}</h4>
+                    <div class="dbrs-public-text">
+                        <h4>dbrs | {{ this.data.title }}</h4>
                     </div>
                 </div>
             </div>
@@ -26,7 +26,7 @@
             <div class="row">
                 <div class="col-md-10 col-sm-10 col-xs-12 center-block">
                     <!-- BEGIN Form -->
-                    <form action="/" method="post" class="form-horizontal url-snr-form">
+                    <form action="/" method="post" class="form-horizontal dbrs-form">
                         <i class="fa fa-link"></i>
 
                         <div id="urlfield" class="input-group">
@@ -39,26 +39,75 @@
                     </form>
                     <!-- END Form -->
 
+                    {% if this.data.latestUrls is not empty%}
+                        <section class="dbrs-box">
+
+                            {% for url in this.data.latestUrls %}
+                                <div class="row url-entity">
+                                    <div class="dbrs-url-valid col-md-12 col-sm-12">
+                                        <div class="col-md-1 col-sm-1 col-xs-1">
+                                            <a class="no-fade linkedin" href="https://www.linkedin.com/profile/view?id=AAEAABUjdPcBQe6I5e2NkmAZqtZwV7MKpRrZFbM" target="_blank" title="I am on Linkedin">
+                                                <p aria-hidden="true" class="icon_link"></p>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-md-11 col-sm-11 col-xs-11">
+
+                                            <div class="dbrs-box-srt col-sm-12">
+                                                <div class="dbrs-box-content">
+                                                    <a href="{{ url.shortUrl }}">{{ url.shortUrl }}</a>
+                                                </div>
+                                            </div>
+                                            <div class="dbrs-box-lng col-sm-12">
+                                                <div class="dbrs-box-content">
+                                                    <a href="{{ url.url }}">{{ url.description }}</a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-12 col-sm-12 dbrs-url-invalid">
+                                        <label for="dbrs-sad-img"></label>
+
+                                        <div id="dbrs-sad-img">
+                                            <img src="/img/icons/sad-face-128.png" alt="Image" width="128" height="128">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                        </section>
+                    {% endif %}
+
                     <!-- BEGIN Result box -->
-                    <section class="url-snr-box" style="display: none">
-                        <div class="row">
-                            <div class="url-snr-url-valid col-md-12 col-sm-12">
-                                <div class="url-snr-box-srt col-sm-12">
-                                    <div class="url-snr-box-content">
-                                        <i class="fa fa-link"></i>
-                                    </div>
+                    <section class="dbrs-box" style="display: none">
+                        <div class="row url-entity">
+                            <div class="dbrs-url-valid col-md-12 col-sm-12">
+                                <div class="col-md-1 col-sm-1 col-xs-1">
+                                    <a class="no-fade linkedin" href="https://www.linkedin.com/profile/view?id=AAEAABUjdPcBQe6I5e2NkmAZqtZwV7MKpRrZFbM" target="_blank" title="I am on Linkedin">
+                                        <p aria-hidden="true" class="icon_link"></p>
+                                    </a>
                                 </div>
-                                <div class="url-snr-box-lng col-sm-12">
-                                    <div class="url-snr-box-content">
-                                        <i class="fa fa-link"></i>
+
+                                <div class="col-md-11 col-sm-11">
+
+                                    <div class="dbrs-box-srt-res col-sm-12">
+                                        <div class="dbrs-box-content-res"></div>
                                     </div>
+                                    <div class="dbrs-box-lng-res col-sm-12">
+                                        <div class="dbrs-box-content-res"></div>
+                                    </div>
+
                                 </div>
+
                             </div>
 
-                            <div class="col-md-12 col-sm-12 url-snr-url-invalid">
-                                <label for="url-snr-sad-img"></label>
+                            <div class="col-md-12 col-sm-12 dbrs-url-invalid">
+                                <label for="dbrs-sad-img"></label>
 
-                                <div id="url-snr-sad-img">
+                                <div id="dbrs-sad-img">
                                     <img src="/img/icons/sad-face-128.png" alt="Image" width="128" height="128">
                                 </div>
                             </div>
@@ -72,7 +121,7 @@
         </div>
     </section>
 
-    <section class="debris-goods">
+    <section class="dbrs-goods">
         <div class="container">
 
             <div class="row">
@@ -82,7 +131,7 @@
                         <div class="fs1" aria-hidden="true" data-icon=""></div>
                     </div>
                     <h4>Responsive</h4>
-                    <p>Responsive Web Design makes Debris look good on all devices (PC, laptops, tablets, and smartphones).</p>
+                    <p>Responsive Web Design makes dbrs look good on all devices (PC, laptops, tablets, and smartphones).</p>
                 </div>
                 <!-- API -->
                 <div class="col-md-4 col-sm-4 col-goods">
@@ -90,7 +139,7 @@
                         <div class="fs1" aria-hidden="true" data-icon=""></div>
                     </div>
                     <h4>API</h4>
-                    <p>For your enjoyment, I created an API. You can send a request from your service to the address of Debris API and get a response data in JSON.</p>
+                    <p>For your enjoyment, I created an API. You can send a request from your service to the address of dbrs API and get a response data in JSON.</p>
                 </div>
                 <!-- Free -->
                 <div class="col-md-4 col-sm-4 col-goods">
@@ -98,13 +147,13 @@
                         <div class="fs1" aria-hidden="true" data-icon=""></div>
                     </div>
                     <h4>Free</h4>
-                    <p>Debris Shortener is completely free. You should not pay for using service never.</p>
+                    <p>dbrs Shortener is completely free. You should not pay for using service never.</p>
                 </div>
             </div>
 
             <div class="row learn-more">
                 <div class="col-sm-12">
-                    <button class="btn btn-default">About Debris</button>
+                    <button class="btn btn-default">About dbrs</button>
                 </div>
             </div>
 
@@ -112,7 +161,7 @@
     </section>
 
 
-    <section class="debris-learn-more">
+    <section class="dbrs-learn-more">
         <div class="container">
             <div class="row goods-description">
                 <div class="desc rwd col-md-12 col-sm-12">

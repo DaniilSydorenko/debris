@@ -1,10 +1,17 @@
 /*---------------------------------------------------------------------------
 [Main Stylesheet]
 
-Project:        Debris
+Project:        dbrs
 Version:        1.0
 Author:         Daniil Sydorenko daniildeveloper@gmail.com
+
+MAP:
+1. Fonts
+2. Base styles
+3. Helper styles
+4. Custom styles
 ------------------------------------------------------------------------------*/
+
 
 /* Fonts
 ------------------------------------------------------------------------------*/
@@ -103,7 +110,7 @@ button:disabled {
     box-shadow: none!important;
 }
 
-.debris-main {
+.dbrs-main {
     margin-top: 100px;
 }
 
@@ -170,25 +177,25 @@ button:disabled {
 
 
 /* Section magic box */
-.debris-magic-box {
+.dbrs-magic-box {
     text-align: left;
 }
 
-.debris-magic-box .container {
+.dbrs-magic-box .container {
     padding: 80px 0 120px 0;
 }
 
-.debris-magic-box .url-snr-public-text {
+.dbrs-magic-box .dbrs-public-text {
     padding: 50px;
     text-align: center;
 }
 
-.debris-magic-box .url-snr-public-text h4 {
+.dbrs-magic-box .dbrs-public-text h4 {
     text-transform: uppercase;
     font-size: 25px;
 }
 
-.debris-magic-box .url-snr-error {
+.dbrs-magic-box .dbrs-error {
     display: none;
     color: #ff5555;
     font-size: 12px;
@@ -200,36 +207,36 @@ button:disabled {
 
 /* Form
 ------------------------------------------------------------------------------*/
-.debris-magic-box form .form-control {
+.dbrs-magic-box form .form-control {
     box-shadow: none;
     height: 54px;
 }
 
-.debris-magic-box form  .form-control:focus {
+.dbrs-magic-box form  .form-control:focus {
     border-color: #66afe9;
     outline: 0;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
 }
 
-.debris-magic-box form > i {
+.dbrs-magic-box form > i {
     position: absolute;
     padding: 19px;
     z-index: 100;
 }
 
-.debris-magic-box form #urlfield .form-control {
+.dbrs-magic-box form #urlfield .form-control {
     padding: 6px 12px 6px 42px;
 }
 
-.debris-magic-box form .btn {
+.dbrs-magic-box form .btn {
     height: 54px;
     text-transform: uppercase;
     font-size: 13px;
 }
 
-/* URL-SNR Box */
-.url-snr-box {
+/* dbrs Box */
+.dbrs-box {
     height: auto;
     width: auto;
     -webkit-box-sizing: border-box;
@@ -238,71 +245,84 @@ button:disabled {
     box-sizing: border-box;
 }
 
-.url-snr-box-content a {
+.dbrs-box .url-entity {
+    border-bottom: 1px solid #f2f2f2;
+    padding: 15px 0;
+}
+
+.dbrs-box .url-entity {
+
+}
+
+.dbrs-box-content a,
+.dbrs-box-content-res a{
     display: block;
     overflow: hidden;
     margin: 0;
     width: 100%;
-    height: 30px;
     text-align: left;
-    padding: 7px 0 0 26px;
 }
 
-.url-snr-box .url-snr-url-valid > .url-snr-box-lng i, .url-snr-box .url-snr-url-valid > .url-snr-box-srt i {
+.dbrs-box-lng .dbrs-box-content > a,
+.dbrs-box-lng-res .dbrs-box-content-res > a {
     font-size: 12px;
-    position: absolute;
-    left: 0;
-    padding: 11px 10px 11px 25px;
-}
-.url-snr-box .url-snr-url-valid > .url-snr-box-lng .form-control {
-    padding: 6px 12px 6px 26px;
+    color: #555555;
 }
 
-.url-snr-box .url-snr-header {
+.dbrs-box .dbrs-header {
     font-size: 14px;
     color: #000 !important;
 }
 
-.url-snr-url-invalid {
+.dbrs-url-invalid {
     display: none;
     width: auto;
 }
 
+.dbrs-url-valid a > p {
+    font-size: 34px;
+    color: #777;
+    border: 1px solid #ccc;
+    padding: 6px;
+    border-radius: 8px;
+    margin: 0;
+}
+
 /* Section Goods
 ------------------------------------------------------------------------------*/
-.debris-goods {
+.dbrs-goods {
     background: #f6f8f9;
 }
 
-.debris-goods .container {
+.dbrs-goods .container {
     padding: 80px 0;
     margin: 0 auto;
 }
 
 
-.debris-goods .learn-more {
+.dbrs-goods .learn-more {
     display: none;
     padding-top: 40px;
 }
 
-.debris-goods .learn-more .btn-default {
+.dbrs-goods .learn-more .btn-default {
     background-color: transparent;
     padding: 12px 30px;
     font-size: 12px;
     text-transform: uppercase;
 }
 
-.debris-goods .learn-more .btn-default:hover {
+.dbrs-goods .learn-more .btn-default:hover {
     background: #e9f0f5;
 }
 
-.debris-goods .learn-more > div {
+.dbrs-goods .learn-more > div {
     background: url('../img/learn_more.gif') 0 0 repeat-x;
     padding-top: 23px;
     margin-top: 70px;
 }
 
-/* Debris goods icons
+/* dbrs goods icons
 ------------------------------------------------------------------------------*/
 .glyph {
     margin: 0 auto;
@@ -329,9 +349,9 @@ button:disabled {
 }
 
 
-.debris-learn-more {}
+.dbrs-learn-more {}
 
-.debris-learn-more .goods-description {
+.dbrs-learn-more .goods-description {
     height: 0;
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
@@ -339,7 +359,7 @@ button:disabled {
 }
 
 
-.debris-learn-more .goods-description .desc {
+.dbrs-learn-more .goods-description .desc {
     height: 0;
     display: none;
     -webkit-transition: all 0.3s;
@@ -347,7 +367,7 @@ button:disabled {
     transition: all 0.3s;
 }
 
-.debris-learn-more .goods-description .desc.active {
+.dbrs-learn-more .goods-description .desc.active {
     display: block;
     height: 150px;
     -webkit-transition: all 0.3s;
@@ -431,7 +451,7 @@ button:disabled {
    ========================================================================== */
 
 @media (max-width: 767px) {
-    .debris-magic-box .container {
+    .dbrs-magic-box .container {
         padding-top: 60px;
     }
 
@@ -441,24 +461,17 @@ button:disabled {
         padding: 10px;
     }
 
-    .url-snr-box-srt, .url-snr-box-lng  {
+    .dbrs-box-srt, .dbrs-box-lng,
+    .dbrs-box-srt-res, .dbrs-box-lng-res  {
         float: none;
         width: 100%;
     }
 
-    .url-snr-box-srt > h4, .url-snr-box-lng > h4 {
-        font-size: 16px;
-    }
-
-    .url-snr-box-srt > div > input, .url-snr-box-lng > div > input {
-        font-size: 12px;
-    }
-
-    .url-snr-public-text {
+    .dbrs-public-text {
         padding: 45px;
     }
 
-    .url-snr-public-text > h4 {
+    .dbrs-public-text > h4 {
         font-size: 16px !important;
     }
 

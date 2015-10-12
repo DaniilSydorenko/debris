@@ -7,10 +7,13 @@
 
 
 // Default namespace
-namespace App\Components\Session;
+namespace App\Components;
 
 use Gaia\Components\ORM\Doctrine;
 use Gaia\Utils\Miscellaneous;
+use App\Components\Shortener as ShortenerComponent;
+use App\Entities\Url;
+
 
 /**
  * Class Session
@@ -35,11 +38,18 @@ class Session
     // Domain
     protected $domain = null;
 
+    // Urls
+    protected $anonimUrls = null;
+
     // Session variable name
     protected $sessionVariableName = "sessionId";
 
+    private $anonimUrlsCookieName = "anonimUrls";
+
     // Instance of this class
     private static $oInstance = false;
+
+    private $latestUrls = null;
 
 
     /**
@@ -47,12 +57,13 @@ class Session
      *
      * @static
      * @param null $domain
-     * @return \App\Components\Session\Session
+     * @param null $url
+     * @return \App\Components\Session
      */
-    public static function getInstance($domain = null)
+    public static function getInstance($domain = null, $url = null)
     {
         if (self::$oInstance == false) {
-            self::$oInstance = new Session($domain);
+            self::$oInstance = new Session($domain, $url);
         }
 
         return self::$oInstance;
@@ -62,8 +73,9 @@ class Session
      * Default constructor
      *
      * @param null $domain
+     * @param null $url
      */
-    private function __construct($domain = null)
+    private function __construct($domain = null, $url = null)
     {
         // Prepare cookies
         foreach ($_COOKIE as $Key => $Value) {
@@ -81,19 +93,34 @@ class Session
         }
 
         // Set domain
-        $this->domain = $domain;
-
+//        $this->domain = $domain;
+//
         // Get doctrine instance
         $this->Doctrine = Doctrine::getInstance();
+//
+//        // Clean up, set id, prepare session
+//        $this->cleanUp()
+//
+//;
 
-        // Clean up, set id, prepare session
-        $this->cleanUp();
+        if (isset($_COOKIE[$this->anonimUrlsCookieName])) {
+            $this->setLatestUrls($_COOKIE[$this->anonimUrlsCookieName]);
+
+        }
+//        print_r($latestUrls); die;
 
         // Set session id
         $this->generateSessionId();
+//        var_dump($url); die;
+
+        if ($url) {
+
+        }
+//        var_dump($url);
+
 
         // Prepare session
-        $this->prepareSession();
+        $this->prepareSession($url);
     }
 
     /**
@@ -123,6 +150,18 @@ class Session
         } // Generate session id
         else {
             $this->sessionId = $this->getRandomSessionId();
+        }
+    }
+
+    private function setAnonimCookie($url)
+    {
+        if (isset($_COOKIE[$this->anonimUrlsCookieName])) {
+            if (strpos($_COOKIE[$this->anonimUrlsCookieName], $url) === false) {
+                $setWithNewUrl = $_COOKIE[$this->anonimUrlsCookieName] . "," . $url;
+                setcookie($this->anonimUrlsCookieName, $setWithNewUrl, time() + (86400 * 30), "/"); // 86400 = 1 day
+            }
+        } else {
+            setcookie($this->anonimUrlsCookieName, $url, time() + (86400 * 30), "/"); // 86400 = 1 day
         }
     }
 
@@ -172,9 +211,11 @@ class Session
 
     /**
      * Prepare session
+     * @param null $url
      */
-    private function prepareSession()
+    private function prepareSession($url)
     {
+//        var_dump($url); die;
         // Get current date-time
         $Now = new \DateTime();
 
@@ -184,43 +225,43 @@ class Session
         }
 
         // Try to find session by session id
-        $Session = $this->Doctrine->getRepository("\\App\\Models\\Session")->findOneBy(array(
-            "sessionId" => $this->sessionId
-        ));
+//        $Session = $this->Doctrine->getRepository("\\App\\Models\\Session")->findOneBy(array(
+//            "sessionId" => $this->sessionId
+//        ));
 
         // Session not found
-        if ($Session === null) {
-
-//            $User = $this->Doctrine->getRepository("App\\Models\\User")->findOneBy(array("id" => 1));
-
-            // Create new session
-            $NewSession = new \App\Models\Session();
-
-            // Set session properties
-            $NewSession->setSessionId($this->sessionId);
-            $NewSession->setIp(Miscellaneous::getClientIp());
-            $NewSession->setBrowser((string)$this->getClientBrowser());
-            $NewSession->setValid($Now->getTimestamp() + $this->sessionLifetime);
-            $NewSession->setData("");
-//            $NewSession->setUsers($User);
-
-            // Save session
-            $this->Doctrine->persist($NewSession);
-            $this->Doctrine->flush();
-        } // Session exist
-        else {
-            // Set valid
-            $Session->setValid($Now->getTimestamp() + $this->sessionLifetime);
-
-            // Save session
-            $this->Doctrine->flush();
-
-            // Un-serialize session data
-            $this->sessionData = \unserialize($Session->getData());
-        }
+//        if ($Session === null) {
+//
+////            $User = $this->Doctrine->getRepository("App\\Models\\User")->findOneBy(array("id" => 1));
+//
+//            // Create new session
+//            $NewSession = new \App\Models\Session();
+//
+//            // Set session properties
+//            $NewSession->setSessionId($this->sessionId);
+//            $NewSession->setIp(Miscellaneous::getClientIp());
+//            $NewSession->setBrowser((string)$this->getClientBrowser());
+//            $NewSession->setValid($Now->getTimestamp() + $this->sessionLifetime);
+//            $NewSession->setData("");
+////            $NewSession->setUsers($User);
+//
+//            // Save session
+//            $this->Doctrine->persist($NewSession);
+//            $this->Doctrine->flush();
+//        } // Session exist
+//        else {
+//            // Set valid
+//            $Session->setValid($Now->getTimestamp() + $this->sessionLifetime);
+//
+//            // Save session
+//            $this->Doctrine->flush();
+//
+//            // Un-serialize session data
+//            $this->sessionData = \unserialize($Session->getData());
+//        }
 
         // Start session (required for external libraries like facebook ..etc)
-        \session_start();
+//        \session_start();
 
         // Set session id in cookies
         $_COOKIE[$this->sessionVariableName] = $this->sessionId;
@@ -228,11 +269,21 @@ class Session
         // Set cookie without domain
         if ($this->domain === null) {
             \setcookie($this->sessionVariableName, $this->sessionId, $Now->getTimestamp() + $this->sessionLifetime, "/");
+
+//            $Shortener = new ShortenerComponent();
+//
+//            \setcookie("anonimUrls", , $Now->getTimestamp() + $this->sessionLifetime, "/");
         } // Set cookie with domain
         else {
             \setcookie($this->sessionVariableName, $this->sessionId, $Now->getTimestamp() + $this->sessionLifetime, "/", $this->domain);
         }
+
+        if ($url) {
+//            var_dump("dfg"); die;
+            $this->setAnonimCookie($url);
+        }
     }
+
 
     /**
      * Get session id
@@ -331,9 +382,9 @@ class Session
     public function delete($name)
     {
         // Try to find session by session id
-        $Session = $this->Doctrine->getRepository("\\App\\Models\\Session")->findOneBy(array(
+        $Session = $this->Doctrine->getRepository("\\App\\Models\\Session")->findOneBy([
             "sessionId" => $this->sessionId
-        ));
+        ]);
 
         // Session doesn't exist - return false
         if ($Session === null) {
@@ -429,4 +480,51 @@ class Session
 
         $QB->getQuery()->execute();
     }
+
+
+    /**
+     * @return null
+     */
+    public function getLatestUrls()
+    {
+        // @TODO get latest url with long url and description
+
+        if (!empty($this->latestUrls)) {
+            $latestUrlsArray = \explode(",", $this->latestUrls);
+
+            $usersUrls = [];
+
+            foreach ($latestUrlsArray as $key => $url) {
+
+//                $Url = $this->Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => "http://php.net/manual/ru/features.cookies.php"]);
+//                var_dump($Url); die;
+
+                /**
+                 * @var $Url \App\Entities\Url
+                 */
+                $Url = $this->Doctrine->getRepository("\\App\\Models\\Url")->findOneBy(["shortUrl" => $url]);
+
+
+                $usersUrls[$key] = [
+                    "shortUrl" => $Url->getShortUrl(),
+                    "url" => $Url->getUrl(),
+                    "description" => $Url->getDescription()
+                ];
+            }
+
+            return $usersUrls;
+
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param null $latestUrls
+     */
+    public function setLatestUrls($latestUrls)
+    {
+        $this->latestUrls = $latestUrls;
+    }
+
 }

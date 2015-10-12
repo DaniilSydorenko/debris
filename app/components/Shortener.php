@@ -12,6 +12,8 @@ namespace App\Components;
 use Gaia\Components\ORM\Doctrine;
 use App\Entities\Url;
 
+use App\Components\Session as SessionComponent;
+
 /**
  * Shortener class
  *
@@ -80,6 +82,9 @@ class Shortener
                 $Url = $this->Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => $responseFromValidation]);
 
                 if ($Url instanceof \App\Entities\Url) {
+
+                    SessionComponent::getInstance(null, $Url->getShortUrl());
+
                     return $response = [
                         'shortUrl' => $Url->getShortUrl(),
                         'description' => $Url->getDescription(),
@@ -111,6 +116,8 @@ class Shortener
                     // Set hash(for future, maybe a password ??)
                     $hash = \sha1(\md5(\uniqid()));
 
+                    // Miscellaneous::getClientIp()  ??????
+
                     $userIp = '';
                     if (\getenv('HTTP_CLIENT_IP'))
                         $userIp = getenv('HTTP_CLIENT_IP');
@@ -130,6 +137,9 @@ class Shortener
                     // Try to save
                     $result = $this->setShortUrl($responseFromValidation, $shortUrl, $siteDescription, $hash, $userIp);
                     $responseResult = (empty($result)) ? $shortUrl : $result;
+
+                    SessionComponent::getInstance(null, $responseResult);
+
 
                     return $response = [
                         'shortUrl' => $responseResult,
@@ -168,7 +178,7 @@ class Shortener
      * @param $url
      * @return null|string
      */
-    protected function getSiteDescription($url)
+    private function getSiteDescription($url)
     {
         $siteDescription = null;
         $agent = 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20100101 Firefox/17.0';;
@@ -187,8 +197,9 @@ class Shortener
                 if (!$res) {
                     return null;
                 } else {
-                    // Clean up title: remove EOL's and excessive whitespace.
-                    $title = \trim(\preg_replace('/\s+/', ' ', $title_matches[1]));
+                    // Clean up title: remove EOL's and excessive whitespace
+                    // and convert html entities to usual text symbols
+                    $title = \html_entity_decode(\trim(\preg_replace('/\s+/', ' ', $title_matches[1])));
 
                     // If url not in utf-8 convert to utf-8
                     if (mb_detect_encoding($title, 'UTF-8', true) === false) {
@@ -227,7 +238,7 @@ class Shortener
      * @param $url
      * @return int|string
      */
-    protected function validateUrl($url)
+    private function validateUrl($url)
     {
         // Check if url string longer than 1000 symbols
         if (\mb_strlen($url, 'UTF-8') < 1000) {
@@ -262,7 +273,7 @@ class Shortener
      * @param $userIp
      * @return null|string
      */
-    protected function setShortUrl($url, $shortUrl, $description, $hash, $userIp)
+    private function setShortUrl($url, $shortUrl, $description, $hash, $userIp)
     {
         // Create new url
         $Url = new Url();
@@ -274,12 +285,15 @@ class Shortener
         try {
             $this->Doctrine->persist($Url);
             $this->Doctrine->flush();
+
             return null;
         } catch (\Exception $Exception) {
             $Error = new \Exception(\App\Libraries\Error\Code::CAN_NOT_SAVE);
             return $Error->getMessage();
         }
     }
+
+
 
     /**
      * Method: _requestStatus
