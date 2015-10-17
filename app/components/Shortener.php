@@ -129,7 +129,7 @@ class Shortener
                     $responseResult = (empty($result)) ? $shortUrl : $result;
 
                     // Add short url to cookie
-                    if (\strpos($responseResult, "dbrs")) {
+                    if (\strpos($responseResult, "debris")) {
                         SessionComponent::getInstance(null, $responseResult);
                     }
 

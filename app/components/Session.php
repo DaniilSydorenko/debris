@@ -495,24 +495,21 @@ class Session
             $usersUrls = [];
 
             foreach ($latestUrlsArray as $key => $url) {
-
-//                $Url = $this->Doctrine->getRepository("App\\Models\\Url")->findOneBy(["url" => "http://php.net/manual/ru/features.cookies.php"]);
-//                var_dump($Url); die;
-
                 /**
                  * @var $Url \App\Entities\Url
                  */
                 $Url = $this->Doctrine->getRepository("\\App\\Models\\Url")->findOneBy(["shortUrl" => $url]);
 
-
                 $usersUrls[$key] = [
                     "shortUrl" => $Url->getShortUrl(),
                     "url" => $Url->getUrl(),
-                    "description" => $Url->getDescription()
+                    "description" => $Url->getDescription(),
+                    "views" => $Url->getViews()
                 ];
             }
 
-            return $usersUrls;
+            // Proper order for urls, last url on top
+            return \array_reverse($usersUrls);
 
         } else {
             return null;

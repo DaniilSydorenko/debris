@@ -1,7 +1,7 @@
 /**
  * Animated header
  */
-$(function() {
+$(function () {
     $(window).scroll(function () {
         var scroll = getCurrentScroll();
         if (scroll >= 60) {
@@ -42,17 +42,16 @@ $(function() {
 //}
 
 /* Load all JS functions */
-$(document).ready(function(){
+$(document).ready(function () {
 
     // @TODO: Separate url. parse and common
 
-    var myRegExp =/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+    var myRegExp = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
 
-    $('form input[name*="urlfield[url]"]').on('keyup', function ()
-    {
+    $('form input[name*="urlfield[url]"]').on('keyup', function () {
         var $input = $(this).val(),
             $element = $("#urlfield_url"),
-            $button =  $("form button"),
+            $button = $("form button"),
             accessColors = {'border-color': '#92dce0', 'background-color': '#ffffff'},
             errorColors = {'border-color': '#E86850', 'box-shadow': 'none', 'background-color': '#ffeeee'};
 
@@ -121,8 +120,7 @@ $(document).ready(function(){
                     'type': method,
                     'dataType': 'json',
                     'data': {url: $urlInput.val()},
-                    'success': function (data)
-                    {
+                    'success': function (data) {
                         var shortUrl = data.data.shortUrl,
                             longUrl = data.data.longUrl,
                             urlViews = data.data.urlViews,
@@ -130,53 +128,85 @@ $(document).ready(function(){
 
                         //if (shortUrl) {
 
-                            $("form.dbrs-form input").val('');
-                            $(".dbrs-box").slideUp().fadeIn();
-                            if (shortUrl.toLowerCase().indexOf("http://") >= 0) {
+                        $("form.dbrs-form input").val('');
+                        //$(".dbrs-box").slideUp().fadeIn();
+                        if (shortUrl.toLowerCase().indexOf("http://") >= 0) {
 
-                                // @TODO REMOVE BEFORE
+                            //$(".dbrs-box-content-res").empty();
 
-                                $(".dbrs-box-content-res").empty();
+                            // pack in func
 
-                                // Create short link
-                                var shortLink = $("<a></a>")
-                                    .addClass("dbrs-short-url")
-                                    .attr("href", shortUrl)
-                                    .text(shortUrl);
-                                $(".dbrs-box-srt-res .dbrs-box-content-res").append(shortLink);
+                            // Create short link
+                            var shortLink = $("<a></a>")
+                                .addClass("dbrs-short-url")
+                                .attr("href", shortUrl)
+                                .text(shortUrl);
 
-                                // Create long link
-                                var longLink = $("<a></a>")
-                                    .addClass(".dbrs-long-url")
-                                    .attr("href", longUrl)
-                                    .text(urlDescription);
-                                $(".dbrs-box-lng-res .dbrs-box-content-res").append(longLink);
+                            // Create long link
+                            var longLink = $("<a></a>")
+                                .addClass(".dbrs-long-url")
+                                .attr("href", longUrl)
+                                .text(urlDescription);
 
+                            var $urlEntity = $('<div class="row url-entity"></div>');
 
-                                //$(".dbrs-short-url").text(shortUrl);
-                                //$(".dbrs-long-url").text(longUrl);
-                                //$("#url-statistic").text(urlViews);
+                            var $validUrl = $('<div class="dbrs-url-valid-res col-md-12 col-sm-12"></div>');
 
-                            } else {
+                            var $rowIco = $('<div class="col-md-1 col-sm-1 col-xs-1">' +
+                                                '<a class="no-fade" href="#" target="_blank" title="">' +
+                                                    '<p aria-hidden="true" class="icon_link"></p>' +
+                                                '</a>' +
+                                            '</div>');
+
+                            var $row = $('<div class="col-md-9 col-sm-9 col-xs-9"></div>');
+
+                            var $rowAction = $('<div class="dbrs-url-action col-md-2 col-sm-2 col-xs-2"></div>');
+
+                            var $views = $('<p class="dbrs-url-views">Views: <span>0</span></p>');
+                            var $copyBtn = $('<button class="dbrs-url-copy">Copy</button>');
+
+                            $rowAction.append($views);
+                            $rowAction.append($copyBtn);
+
+                            var $sh = $('<div class="dbrs-box-srt-res col-sm-12"></div>');
+                            var $ln = $('<div class="dbrs-box-lng-res col-sm-12"></div>');
+
+                            var $shResContent = $('<div class="dbrs-box-content-res"></div>').html(shortLink);
+                            var $lnResContent = $('<div class="dbrs-box-content-res"></div>').html(longLink);
+
+                            $sh.html($shResContent);
+                            $ln.html($lnResContent);
+
+                            $row.append($sh);
+                            $row.append($ln);
+
+                            $validUrl.append($rowIco);
+                            $validUrl.append($row);
+                            $validUrl.append($rowAction);
+
+                            $urlEntity.append($validUrl);
+
+                            $('.done-urls').prepend($urlEntity.fadeIn(500));
+
+                        } else {
+                            $(".dbrs-url-valid").hide();
+                            $('label[for="dbrs-sad-img"]').text(shortUrl);
+                            $(".dbrs-url-invalid").slideUp().fadeIn();
+                            $submit.attr('disabled', 'true');
+
+                            setTimeout(function () {
                                 $(".dbrs-url-valid").hide();
-                                $('label[for="dbrs-sad-img"]').text(shortUrl);
-                                $(".dbrs-url-invalid").slideUp().fadeIn();
-                                $submit.attr('disabled', 'true');
-
-                                setTimeout(function () {
-                                    $(".dbrs-url-valid").hide();
-                                    //$element.css(errorColors);
-                                    //$button.prop("disabled", true);
-                                    $(".dbrs-error").fadeIn();
-                                }, 300);
-                            }
+                                //$element.css(errorColors);
+                                //$button.prop("disabled", true);
+                                $(".dbrs-error").fadeIn();
+                            }, 300);
+                        }
                         //}
                         //else {
                         //    // Error
                         //}
                     },
-                    'error': function ()
-                    {
+                    'error': function () {
                         // Error
                     }
                 }

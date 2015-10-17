@@ -27,8 +27,6 @@
                 <div class="col-md-10 col-sm-10 col-xs-12 center-block">
                     <!-- BEGIN Form -->
                     <form action="/" method="post" class="form-horizontal dbrs-form">
-                        <i class="fa fa-link"></i>
-
                         <div id="urlfield" class="input-group">
                             <input type="text" id="urlfield_url" name="urlfield[url]" required="required" class="form-control"
                                    placeholder="Paste your URL" value="" autocomplete="off" autocorrect="off" autocapitalize="off">
@@ -39,20 +37,34 @@
                     </form>
                     <!-- END Form -->
 
+                    <!-- BEGIN url section -->
+                    <section class="dbrs-box done-urls">
+
+                        <div class="col-md-12 col-sm-12 dbrs-url-invalid">
+                            <label for="dbrs-sad-img"></label>
+
+                            <div id="dbrs-sad-img">
+                                <img src="/img/icons/sad-face-128.png" alt="Image" width="128" height="128">
+                            </div>
+                        </div>
+                    </section>
+                    <!-- END url section -->
+
                     {% if this.data.latestUrls is not empty%}
-                        <section class="dbrs-box">
+                        <section class="dbrs-box recent-urls">
 
                             {% for url in this.data.latestUrls %}
                                 <div class="row url-entity">
                                     <div class="dbrs-url-valid col-md-12 col-sm-12">
+                                        <!-- Url ico -->
                                         <div class="col-md-1 col-sm-1 col-xs-1">
-                                            <a class="no-fade linkedin" href="https://www.linkedin.com/profile/view?id=AAEAABUjdPcBQe6I5e2NkmAZqtZwV7MKpRrZFbM" target="_blank" title="I am on Linkedin">
+                                            <a class="no-fade" href="#" target="_blank" title="">
                                                 <p aria-hidden="true" class="icon_link"></p>
                                             </a>
                                         </div>
 
-                                        <div class="col-md-11 col-sm-11 col-xs-11">
-
+                                        <!-- Url data -->
+                                        <div class="col-md-9 col-sm-9 col-xs-9">
                                             <div class="dbrs-box-srt col-sm-12">
                                                 <div class="dbrs-box-content">
                                                     <a href="{{ url.shortUrl }}">{{ url.shortUrl }}</a>
@@ -63,9 +75,13 @@
                                                     <a href="{{ url.url }}">{{ url.description }}</a>
                                                 </div>
                                             </div>
-
                                         </div>
 
+                                        <!-- Url action -->
+                                        <div class="dbrs-url-action col-md-2 col-sm-2 col-xs-2">
+                                            <p class="dbrs-url-views">Views: <span>{{ url.views }}</span></p>
+                                            <button class="dbrs-url-copy">Copy</button>
+                                        </div>
                                     </div>
 
                                     <div class="col-md-12 col-sm-12 dbrs-url-invalid">
@@ -80,40 +96,6 @@
 
                         </section>
                     {% endif %}
-
-                    <!-- BEGIN Result box -->
-                    <section class="dbrs-box" style="display: none">
-                        <div class="row url-entity">
-                            <div class="dbrs-url-valid col-md-12 col-sm-12">
-                                <div class="col-md-1 col-sm-1 col-xs-1">
-                                    <a class="no-fade linkedin" href="https://www.linkedin.com/profile/view?id=AAEAABUjdPcBQe6I5e2NkmAZqtZwV7MKpRrZFbM" target="_blank" title="I am on Linkedin">
-                                        <p aria-hidden="true" class="icon_link"></p>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-11 col-sm-11">
-
-                                    <div class="dbrs-box-srt-res col-sm-12">
-                                        <div class="dbrs-box-content-res"></div>
-                                    </div>
-                                    <div class="dbrs-box-lng-res col-sm-12">
-                                        <div class="dbrs-box-content-res"></div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="col-md-12 col-sm-12 dbrs-url-invalid">
-                                <label for="dbrs-sad-img"></label>
-
-                                <div id="dbrs-sad-img">
-                                    <img src="/img/icons/sad-face-128.png" alt="Image" width="128" height="128">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    <!-- END Result box -->
 
                 </div>
             </div>
