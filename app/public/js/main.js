@@ -20,28 +20,6 @@ $(function () {
     }
 });
 
-/* Set Qtip on fields */
-//function setQtip() {
-//    $('form input[name*="urlfield[url]"]').each(function() {
-//        $(this).qtip({
-//            content: {
-//                text: 'Type your url with \'http://\''
-//            },
-//            style: {
-//                name: 'dark',
-//                tip: true
-//            },
-//            show: {
-//                effect: {
-//                    type: 'slide',
-//                    length: 500
-//                }
-//            }
-//        });
-//    });
-//}
-
-/* Load all JS functions */
 $(document).ready(function () {
 
     // @TODO: Separate url. parse and common
@@ -94,10 +72,6 @@ $(document).ready(function () {
             }, 300);
         } else if (urlToValidate.length >= 1 && !myRegExp.test(urlToValidate)) {
 
-            // Check url length
-            // to lowercase
-            // rtrim / ??
-
             $("form.dbrs-form").hide();
             $(".dbrs-box").fadeIn("slow");
 
@@ -106,12 +80,8 @@ $(document).ready(function () {
             $(".dbrs-url-invalid").slideUp().fadeIn();
 
             setTimeout(function () {
-                //$element.css(errorColors);
-                //$button.prop("disabled", true);
                 $(".dbrs-error").fadeIn();
             }, 300);
-
-            //$submit.prop("disabled", true);
 
         } else {
             $.ajax(
@@ -126,68 +96,44 @@ $(document).ready(function () {
                             urlViews = data.data.urlViews,
                             urlDescription = data.data.description;
 
-                        //if (shortUrl) {
-
                         $("form.dbrs-form input").val('');
-                        //$(".dbrs-box").slideUp().fadeIn();
                         if (shortUrl.toLowerCase().indexOf("http://") >= 0) {
 
-                            //$(".dbrs-box-content-res").empty();
+                            var shLink = $("<a></a>").addClass("dbrs-short-url").attr("href", shortUrl).text(shortUrl);
+                            var lnLink = $("<a></a>").addClass("dbrs-long-url").attr("href", longUrl).text(urlDescription);
 
-                            // pack in func
-
-                            // Create short link
-                            var shortLink = $("<a></a>")
-                                .addClass("dbrs-short-url")
-                                .attr("href", shortUrl)
-                                .text(shortUrl);
-
-                            // Create long link
-                            var longLink = $("<a></a>")
-                                .addClass(".dbrs-long-url")
-                                .attr("href", longUrl)
-                                .text(urlDescription);
-
-                            var $urlEntity = $('<div class="row url-entity"></div>');
-
-                            var $validUrl = $('<div class="dbrs-url-valid-res col-md-12 col-sm-12"></div>');
-
-                            var $rowIco = $('<div class="col-md-1 col-sm-1 col-xs-1">' +
+                            var $urlEntity = $('<div class="row url-entity"></div>'),
+                                $validUrl = $('<div class="dbrs-url-valid-res col-md-12 col-sm-12"></div>'),
+                                $rowIco = $('<div class="col-md-1 col-sm-1 col-xs-1">' +
                                                 '<a class="no-fade" href="#" target="_blank" title="">' +
                                                     '<p aria-hidden="true" class="icon_link"></p>' +
                                                 '</a>' +
-                                            '</div>');
+                                            '</div>'),
+                                $row = $('<div class="col-md-9 col-sm-9 col-xs-9"></div>'),
+                                $rowAction = $('<div class="dbrs-url-action col-md-2 col-sm-2 col-xs-2"></div>'),
+                                $viewsCounter = $('<span></span>').text(urlViews),
+                                $views = $('<p class="dbrs-url-views"></p>'),
+                                $copyBtn = $('<button class="dbrs-url-copy">Copy</button>');
 
-                            var $row = $('<div class="col-md-9 col-sm-9 col-xs-9"></div>');
-
-                            var $rowAction = $('<div class="dbrs-url-action col-md-2 col-sm-2 col-xs-2"></div>');
-
-                            var $views = $('<p class="dbrs-url-views">Views: <span>0</span></p>');
-                            var $copyBtn = $('<button class="dbrs-url-copy">Copy</button>');
-
+                            $views.text("Views: ");
+                            $views.append($viewsCounter);
                             $rowAction.append($views);
                             $rowAction.append($copyBtn);
 
-                            var $sh = $('<div class="dbrs-box-srt-res col-sm-12"></div>');
-                            var $ln = $('<div class="dbrs-box-lng-res col-sm-12"></div>');
-
-                            var $shResContent = $('<div class="dbrs-box-content-res"></div>').html(shortLink);
-                            var $lnResContent = $('<div class="dbrs-box-content-res"></div>').html(longLink);
+                            var $sh = $('<div class="dbrs-box-srt-res col-sm-12"></div>'),
+                                $ln = $('<div class="dbrs-box-lng-res col-sm-12"></div>'),
+                                $shResContent = $('<div class="dbrs-box-content-res"></div>').html(shLink),
+                                $lnResContent = $('<div class="dbrs-box-content-res"></div>').html(lnLink);
 
                             $sh.html($shResContent);
                             $ln.html($lnResContent);
-
                             $row.append($sh);
                             $row.append($ln);
-
                             $validUrl.append($rowIco);
                             $validUrl.append($row);
                             $validUrl.append($rowAction);
-
                             $urlEntity.append($validUrl);
-
                             $('.done-urls').prepend($urlEntity.fadeIn(500));
-
                         } else {
                             $(".dbrs-url-valid").hide();
                             $('label[for="dbrs-sad-img"]').text(shortUrl);
@@ -196,15 +142,9 @@ $(document).ready(function () {
 
                             setTimeout(function () {
                                 $(".dbrs-url-valid").hide();
-                                //$element.css(errorColors);
-                                //$button.prop("disabled", true);
                                 $(".dbrs-error").fadeIn();
                             }, 300);
                         }
-                        //}
-                        //else {
-                        //    // Error
-                        //}
                     },
                     'error': function () {
                         // Error

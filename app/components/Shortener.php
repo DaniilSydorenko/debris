@@ -15,9 +15,6 @@ use App\Components\Session as SessionComponent;
 
 /**
  * Shortener class
- *
- * @TODO Кирилица в описании
- *
  */
 class Shortener
 {
