@@ -22,6 +22,19 @@ $(function () {
 
 $(document).ready(function () {
 
+    //var client = new ZeroClipboard( document.getElementById("copy-button") );
+    //
+    //client.on( "ready", function( readyEvent ) {
+    //    // alert( "ZeroClipboard SWF is ready!" );
+    //
+    //    client.on( "aftercopy", function( event ) {
+    //        // `this` === `client`
+    //        // `event.target` === the element that was clicked
+    //        event.target.style.display = "none";
+    //        alert("Copied text to clipboard: " + event.data["text/plain"] );
+    //    } );
+    //} );
+
     // @TODO: Separate url. parse and common
 
     var myRegExp = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
@@ -102,7 +115,7 @@ $(document).ready(function () {
                             var shLink = $("<a></a>").addClass("dbrs-short-url").attr("href", shortUrl).text(shortUrl);
                             var lnLink = $("<a></a>").addClass("dbrs-long-url").attr("href", longUrl).text(urlDescription);
 
-                            var $urlEntity = $('<div class="row url-entity"></div>'),
+                            var $doneUrl = $('<div class="row url-entity"></div>'),
                                 $validUrl = $('<div class="dbrs-url-valid-res col-md-12 col-sm-12"></div>'),
                                 $rowIco = $('<div class="col-md-1 col-sm-1 col-xs-1">' +
                                                 '<a class="no-fade" href="#" target="_blank" title="">' +
@@ -132,8 +145,25 @@ $(document).ready(function () {
                             $validUrl.append($rowIco);
                             $validUrl.append($row);
                             $validUrl.append($rowAction);
-                            $urlEntity.append($validUrl);
-                            $('.done-urls').prepend($urlEntity.fadeIn(500));
+                            $doneUrl.append($validUrl);
+
+                            var $lastUrl = $('.done-urls .url-entity');
+                            if ($lastUrl.length > 0){
+                                if ($('.recent-urls:contains(shortUrl)') || $('.done-urls:contains(shortUrl)')) {
+                                    $('.done-urls').html($doneUrl.fadeIn(500));
+                                } else {
+                                    $('.recent-urls').prepend($lastUrl.fadeIn(500));
+                                    $('.done-urls').prepend($doneUrl.fadeIn(500));
+                                }
+
+                            } else {
+                                if ($('.recent-urls:contains(shortUrl)')) {
+
+                                    console.log(shortUrl);
+                                }
+                                $('.done-urls').prepend($doneUrl.fadeIn(500));
+                            }
+
                         } else {
                             $(".dbrs-url-valid").hide();
                             $('label[for="dbrs-sad-img"]').text(shortUrl);
