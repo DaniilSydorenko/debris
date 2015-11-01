@@ -126,7 +126,7 @@ class Shortener
                     $responseResult = (empty($result)) ? $shortUrl : $result;
 
                     // Add short url to cookie
-                    if (\strpos($responseResult, "debris")) {
+                    if (\strpos($responseResult, "dbrs")) {
                         SessionComponent::getInstance(null, $responseResult);
                     }
 
@@ -239,7 +239,7 @@ class Shortener
             if (\preg_match('/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i', $urlClear)) {
 
                 // Check if url has debris domain
-                if (\strpos($urlClear, "debris.dev")) {
+                if (\strpos($urlClear, "dbrs")) {
                     return 003;
                 } else {
                     return $urlClear;
